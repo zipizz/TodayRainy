@@ -16,7 +16,7 @@
         android:id="@+id/todayRainView"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:text="@string/rain_today"
+        android:text="csv 파일 읽기"
         android:layout_weight="1"/>
 
     <Button
