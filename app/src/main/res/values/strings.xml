@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">apiexample</string>
+    <string name="rain_today">오늘 비오니?</string>
+</resources>
