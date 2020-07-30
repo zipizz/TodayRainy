@@ -16,7 +16,7 @@
         android:id="@+id/todayRainView"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:text="csv 파일 읽기2"
+        android:text="csv 파일 읽기3"
         android:layout_weight="1"/>
 
     <Button
