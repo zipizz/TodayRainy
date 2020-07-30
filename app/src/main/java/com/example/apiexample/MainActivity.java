@@ -27,6 +27,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+
+
+
+
+
+
         ((Button)findViewById(R.id.todayRainView)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -34,9 +42,17 @@ public class MainActivity extends AppCompatActivity {
                 mRegionDataCollections = mCSVFileReader.getRegionDataCollectionsFromCSVFile();
                 mSQLiteDatabaseManager = new SQLiteDatabaseManager(MainActivity.this);
                 mSQLiteDatabaseManager.createRegionDataDB(mRegionDataCollections);
+
+
+
+
                 mSQLiteDatabaseManager.showRegionDataDB();
             }
         });
+
+
+
+
 
         ((Button)findViewById(R.id.button2)).setOnClickListener(new View.OnClickListener() {
             @Override
