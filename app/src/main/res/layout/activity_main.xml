@@ -18,20 +18,20 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_weight="1"
-            android:text="csv 파일 읽기9.." />
+            android:text="csv 파일 읽기10.." />
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:text="위도 경도"
-        android:layout_weight="1"/>
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:text="위도 경도" />
 
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:text="network"
-        android:layout_weight="1"/>
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_weight="1"
+            android:text="network" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
