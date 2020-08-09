@@ -3,8 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:background="#55ccbb"
+    android:layout_height="60dp"
+    android:background="@drawable/radius_little"
+    android:layout_marginTop="3dp"
     tools:context=".MainActivity">
 
     <TextView
@@ -25,7 +26,7 @@
         android:layout_height="50dp"
         android:layout_marginRight="20dp"
         android:id="@+id/custom_image_group"
-        android:background="@drawable/radius"
+        android:background="@drawable/radius_blue"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent">

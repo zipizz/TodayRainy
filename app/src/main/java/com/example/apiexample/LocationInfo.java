@@ -32,15 +32,15 @@ public class LocationInfo implements Serializable{
         this(regionStep1, regionStep2, regionStep3, false);
     }
 
-    public LocationInfo (String regionStep1, String regionStep2, String regionStep3, boolean isGlobalRegion) {
+    public LocationInfo(String regionStep1, String regionStep2, String regionStep3, boolean isGlobalRegion) {
         this(regionStep1, regionStep2, regionStep3, isGlobalRegion, -1);
     }
 
-    public LocationInfo (String regionStep1, String regionStep2, String regionStep3, boolean isGlobalRegion, int locationId) {
+    public LocationInfo(String regionStep1, String regionStep2, String regionStep3, boolean isGlobalRegion, int locationId) {
         this(regionStep1, regionStep2, regionStep3, 0, 0, 0, 0, isGlobalRegion, locationId);
     }
 
-    public LocationInfo (String regionStep1, String regionStep2, String regionStep3, int longitudeHour, int longitudeMin, int latitudeHour, int latitudeMin, boolean isGlobalRegion, int locationId) {
+    public LocationInfo(String regionStep1, String regionStep2, String regionStep3, int longitudeHour, int longitudeMin, int latitudeHour, int latitudeMin, boolean isGlobalRegion, int locationId) {
         this.regionStep1 = regionStep1;
         this.regionStep2 = regionStep2;
         this.regionStep3 = regionStep3;
@@ -50,6 +50,20 @@ public class LocationInfo implements Serializable{
         this.latitudeMin = latitudeMin;
         this.isGlobalRegion = isGlobalRegion;
         this.locationId = locationId;
+    }
+
+    public LocationInfo(LocationInfoForServer locationInfoForServer) {
+        this(
+                locationInfoForServer.getRegionStep1(),
+                locationInfoForServer.getRegionStep2(),
+                locationInfoForServer.getRegionStep3(),
+                locationInfoForServer.getLongitudeHour(),
+                locationInfoForServer.getLongitudeMin(),
+                locationInfoForServer.getLatitudeHour(),
+                locationInfoForServer.getLatitudeMin(),
+                false,
+                Constant.CURRENT_LOCATION_ID
+        );
     }
 
     public int getLongitudeHour() {
@@ -130,5 +144,7 @@ public class LocationInfo implements Serializable{
 
         return regionFullName;
     }
-
 }
+
+//https://oneulbionya.ga:8443/BOnyaSvr/rest/local-weather/975570b3-0063-4e17-b110-124da55a3fd4
+//https://oneulbionya.ga:8443/BOnyaSvr/rest/local-weather/1596904527867/1

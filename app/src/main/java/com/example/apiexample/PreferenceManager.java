@@ -95,4 +95,12 @@ public class PreferenceManager {
         editor.remove(key);
         editor.commit();
     }
+
+    public static void incrementMyRegionCount(Context context) {
+        setInt(context, Constant.MY_REGION_COUNT, getInt(context, Constant.MY_REGION_COUNT) + 1);
+    }
+
+    public static void decrementMyRegionCount(Context context) {
+        setInt(context, Constant.MY_REGION_COUNT, getInt(context, Constant.MY_REGION_COUNT) - 1);
+    }
 }

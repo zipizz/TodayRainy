@@ -19,10 +19,17 @@ public class ForecastInformation {
     }
 
     public String getPrecipitationForm() { return precipitationForm; }
+    public String getPrecipitation() { return precipitation; }
+    public String getHumidity() { return humidity; }
+    public String getUid() { return uid; }
     public int getLocationId() { return locationId; }
 
     @Override
     public String toString() {
         return "PTY : " + precipitationForm + ", humidity : " + humidity + ", precipitation : " + precipitation + ", uid : " + uid;
+    }
+
+    public boolean isRainy() {
+        return precipitationForm.charAt(0) - '0' > 0;
     }
 }

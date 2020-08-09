@@ -118,8 +118,12 @@ public class FragmentList extends Fragment {
 //
     private void requestAddLocation (String regionStepOne, String regionStepTwo, String regionStepThree, boolean isGlobalRegion) {
         System.out.println("My app test addlocation here function in");
-        parentActivity.setSelectedLocationInfo(new LocationInfo(regionStepOne, regionStepTwo, regionStepThree, isGlobalRegion));
-        parentActivity.postRequestAddLocation();
+        if (PreferenceManager.getInt(parentActivity, Constant.MY_REGION_COUNT) < Constant.MAX_MY_ADD_LOCATION_COUNT) {
+            parentActivity.setSelectedLocationInfo(new LocationInfo(regionStepOne, regionStepTwo, regionStepThree, isGlobalRegion));
+            parentActivity.postRequestAddLocation();
+        } else {
+            Toast.makeText(parentActivity, "지역을 더 이상 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public int getRegionStep() {

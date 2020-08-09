@@ -5,13 +5,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -68,7 +66,7 @@ public class SelectLocationActivity extends AppCompatActivity {
             return;
         }
 
-        System.out.println("My app test add location : userid : " + "... , locationId : " + mSelectedLocationId + ", locationInfo : " + mSelectedLocationInfo.toString());
+        System.out.println("My app test add location : userid : " + mUserId + ", locationId : " + mSelectedLocationId + ", locationInfo : " + mSelectedLocationInfo.toString());
         LocationInfoForServer a = new LocationInfoForServer();
         a.setRegionStep1(mSelectedLocationInfo.getRegionStep1());
         a.setRegionStep2(mSelectedLocationInfo.getRegionStep2());
@@ -76,8 +74,6 @@ public class SelectLocationActivity extends AppCompatActivity {
 
         RestAPI restAPI = RestAPIInstance.getInstance().create(RestAPI.class);
         restAPI.AddLocation(mUserId, mSelectedLocationId, a).enqueue(addLocationCallbackFunction);
-        //        AddLocation(getWeatherLocation(regionStepOne, regionStepTwo, regionStepThree, PreferenceManager.getInt(this, Constant.USER_ID))).enqueue(fdsa);
-//          restAPI.AddLocation(getWeatherLocation("경기도", "성남시분당구", "금곡동", PreferenceManager.getInt(this, Constant.USER_ID)).enqueue(fdsa);
     }
 
     public void replaceFragment(Fragment fragment) {
@@ -92,21 +88,25 @@ public class SelectLocationActivity extends AppCompatActivity {
         public void onResponse(Call<Integer> call, Response<Integer> response) {
             if (response.isSuccessful()) {
                 int responseCode = response.body().intValue();
-                System.out.println("My app test add location : response code : " + responseCode);
                 if(responseCode == 0) {
                     System.out.println("My app test add location : response code success");
                     mSelectedLocationInfo.setLocationId(mSelectedLocationId);
                     mSQLiteDatabaseManager.addMyRegionData(mSelectedLocationInfo);
                     mSQLiteDatabaseManager.deleteLocationId(mSelectedLocationId);
-                    PreferenceManager.setInt(SelectLocationActivity.this,
-                            Constant.MY_REGION_COUNT,
-                            PreferenceManager.getInt(SelectLocationActivity.this, Constant.MY_REGION_COUNT) + 1);
+                    PreferenceManager.incrementMyRegionCount(SelectLocationActivity.this);
+                    Intent intent = new Intent();
+                    intent.putExtra("hasAddedRegion", true);
+                    setResult(Constant.ADD_LOCATION_RESULT_SUCCESS_CODE, intent);
+                    finish();
                 } else {
                     System.out.println("My app test add location : response code fail");
                 }
             } else {
                 System.out.println("My app test add location : response fail not successful");
             }
+
+            System.out.println("My app test add location here response.body() is : " + response.body());
+            System.out.println("My app test add location here response is : " + response.toString());
         }
 
         @Override

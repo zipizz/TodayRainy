@@ -5,10 +5,15 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -26,19 +31,35 @@ public class TextViewPagerAdapter extends PagerAdapter {
     private Retrofit mRetrofit = null;
     private MainActivity parentActivity = null;
     private View mView = null;
+    private int mLocationCount = 0;
+    private ArrayList<LocationInfo> mMyLocationInfoList = new ArrayList<LocationInfo>();
 
     public TextViewPagerAdapter () {
-
     }
 
     public TextViewPagerAdapter(Context context, MainActivity parentActivity) {
         this.mContext = context;
         this.parentActivity = parentActivity;
+        this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_REGION_COUNT) + 1;
+        System.out.println("My app test : getLocalWeather getcount : " + mLocationCount);
+        this.mMyLocationInfoList = SQLiteDatabaseManager.getInstance().getMyAddedRegionDataList(false);
+        this.mRetrofit = RestAPIInstance.getInstance();
     }
 
     @Override
     public int getCount() {
-        return 1;
+        return this.mLocationCount;
+    }
+
+    @Override
+    public int getItemPosition(@NonNull Object object) {
+        return POSITION_NONE;
+    }
+
+    protected void setDataChanged() {
+        this.mMyLocationInfoList = SQLiteDatabaseManager.getInstance().getMyAddedRegionDataList(false);
+        this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_REGION_COUNT) + 1;
+        this.notifyDataSetChanged();
     }
 
     @NonNull
@@ -52,9 +73,9 @@ public class TextViewPagerAdapter extends PagerAdapter {
             mView.findViewById(R.id.hereThirdImage).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     Intent intent = new Intent(mContext, AddLocationActivity.class);
-                    parentActivity.startActivity(intent);
+                    parentActivity.startActivityForResult(intent, Constant.CHANGE_LOCATION_REQUEST_CODE);
+
 //                    AddLocationFragment addLocationFragment = new AddLocationFragment(mContext);
 //                    FragmentTransaction fragmentTransaction = parentActivity.getSupportFragmentManager().beginTransaction();
 ////                    fragmentTransaction.add(R.id.favorite_frame, addLocationFragment).commit();
@@ -62,67 +83,28 @@ public class TextViewPagerAdapter extends PagerAdapter {
                 }
             });
 
-//            mView.findViewById(R.id.request_button).setOnClickListener(todayRainyBtnClickListener);
-//            mView.findViewById(R.id.request_button).setTag("request_button");
-//            FragmentList fragmentRegionStepOne = new FragmentList(1, parentActivity, this);
-//            FragmentTransaction fragmentTransaction = parentActivity.getSupportFragmentManager().beginTransaction();
-//            fragmentTransaction.add(R.id.main_frame, fragmentRegionStepOne).commit();
+            LocationInfo locationInfo = mMyLocationInfoList.get(position);
+            if (position == 0) {
+                mView.findViewById(R.id.isCurrentLocation).setVisibility(View.VISIBLE);
+            } else {
+                mView.findViewById(R.id.isCurrentLocation).setVisibility(View.INVISIBLE);
+            }
 
+            SimpleDateFormat dayTime = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            String str = dayTime.format(new Date(System.currentTimeMillis()));
 
-//            ((Button)mView.findViewById(R.id.btn1)). setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    parentActivity.deleteUser();
-//                }
-//            });
+            ((TextView) mView.findViewById(R.id.currentLocation)).setText(locationInfo.toString());
+            ((TextView)mView.findViewById(R.id.updateTime)).setText(str);
 
-//            ((Button)mView.findViewById(R.id.btn2)). setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    String allInformation = "";
-//                    allInformation += "userid : " + PreferenceManager.getString(mContext, Constant.USER_ID)
-//                            + ", my region count : " + PreferenceManager.getInt(mContext, Constant.MY_REGION_COUNT)
-//                            + ", finished ? " + PreferenceManager.getBoolean(mContext, Constant.IS_INITIATION_FINISHED)
-//                            + "\n"
-//                            + "current location info \n";
-//
-//                    class MyAsyncTask extends AsyncTask<Void, Void, String> {
-//
-//                        private String allInformation = "";
-//
-//                        public MyAsyncTask(String allInformation) {
-//                            this.allInformation = allInformation;
-//                        }
-//
-//                        @Override
-//                        protected String doInBackground(Void... voids) {
-//                            for (LocationInfo locationInfo : SQLiteDatabaseManager.getInstance().getMyAddedRegionDataList()) {
-//                                allInformation += locationInfo.getLocationId() + " : " + locationInfo.toString() + "\n";
-//                            }
-//
-//                            allInformation += "remain location id : ";
-//
-//                            for (Integer locationId : SQLiteDatabaseManager.getInstance().getLocationIdList()) {
-//                                allInformation += locationId + " ";
-//                            }
-//
-//                            allInformation += "\n";
-//                            return allInformation;
-//                        }
-//
-//                        @Override
-//                        protected void onPostExecute(String result) {
-//                            System.out.println("My app test allinfo : " + result);
-//                            parentActivity.setMainText(result);
-////                            ((Button)mView.findViewById(R.id.request_button)).setText(result);
-////                            ((Button)mView.findViewWithTag("request_button")).setText(result);
-//
-//                        }
-//                    }
-//
-//                    new MyAsyncTask(allInformation).execute();
-//                }
-//            });
+            ForecastInformation forecastInformation = SQLiteDatabaseManager.getInstance().getForcastInformation(locationInfo.getLocationId());
+
+            if (forecastInformation.isRainy()) {
+                ((TextView)mView.findViewById(R.id.rain_text)).setText("비 온다");
+                ((ImageView)mView.findViewById(R.id.imageCenter)).setImageResource(R.mipmap.ic_launcher_round);
+            } else {
+                ((TextView)mView.findViewById(R.id.rain_text)).setText("비 안 온다");
+                ((ImageView)mView.findViewById(R.id.imageCenter)).setImageResource(R.drawable.splash);
+            }
         }
 
 //        for (int i = 1; i <= 5; i++) {
@@ -165,25 +147,10 @@ public class TextViewPagerAdapter extends PagerAdapter {
     };
 
     private void getRequestGetLocalWeather() {
-        RestAPI restAPI = getRetrofit().create(RestAPI.class);
+        RestAPI restAPI = mRetrofit.create(RestAPI.class);
         String myUserId = PreferenceManager.getString(mContext, Constant.USER_ID);
         System.out.println("My app test : getLocalWeather user Id : " + myUserId);
         restAPI.getLocalWeather(myUserId).enqueue(getLocalWeathersCallback);
-    }
-
-    private Retrofit getRetrofit() {
-        if (mRetrofit != null) {
-            return mRetrofit;
-        }
-        mRetrofit = new Retrofit.Builder().baseUrl(Constant.SERVER_BASE_URL).client(
-                new OkHttpClient.Builder().sslSocketFactory(SSLSocket.getPinnedCertSslSocketFactory(mContext))
-                        .hostnameVerifier(((hostname, session) -> true))
-                        .build())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        return mRetrofit;
     }
 
     private Callback<List<LinkedHashMap>> getLocalWeathersCallback = new Callback<List<LinkedHashMap>>() {
