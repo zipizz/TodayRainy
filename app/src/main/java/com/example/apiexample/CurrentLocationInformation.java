@@ -15,7 +15,7 @@ import androidx.core.app.ActivityCompat;
 import java.io.IOException;
 import java.util.List;
 
-public class GPSInformation {
+public class CurrentLocationInformation {
 
     private Context mContext;
     private Location mLocation = null;
@@ -23,7 +23,7 @@ public class GPSInformation {
     private int mLatitudeHour, mLatitudeMinute, mLongitudeHour, mLongitudeMinute;
     private Address GPSAddress = null;
 
-    public GPSInformation(Context context) {
+    public CurrentLocationInformation(Context context) {
         mContext = context;
 
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

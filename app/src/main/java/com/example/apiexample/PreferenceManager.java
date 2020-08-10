@@ -103,4 +103,8 @@ public class PreferenceManager {
     public static void decrementMyRegionCount(Context context) {
         setInt(context, Constant.MY_REGION_COUNT, getInt(context, Constant.MY_REGION_COUNT) - 1);
     }
+
+    public static void incrementGrantedPermissionCount(Context context) {
+        setInt(context, Constant.GRANT_PERMISSION_COUNT, getInt(context, Constant.GRANT_PERMISSION_COUNT, 0) + 1);
+    }
 }

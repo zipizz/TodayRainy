@@ -41,7 +41,6 @@ public class TextViewPagerAdapter extends PagerAdapter {
         this.mContext = context;
         this.parentActivity = parentActivity;
         this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_REGION_COUNT) + 1;
-        System.out.println("My app test : getLocalWeather getcount : " + mLocationCount);
         this.mMyLocationInfoList = SQLiteDatabaseManager.getInstance().getMyAddedRegionDataList(false);
         this.mRetrofit = RestAPIInstance.getInstance();
     }

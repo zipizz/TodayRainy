@@ -16,4 +16,17 @@ public class Utils {
         String uid = responseElement.get("uid").toString();
         return new ForecastInformation(precipitationForm, humidity, precipitation, uid, locationId);
     }
+
+    public static String getFormattedLocationNameFromFullName(String fullName) {
+        for (int i = 0, spaceCount = 0; i < fullName.length(); i++) {
+            if (fullName.indexOf(i) == ' ') {
+                spaceCount++;
+            }
+            if (spaceCount == 4) {
+                fullName = fullName.substring(0, i).replaceAll("대한민국 ", "");
+                break;
+            }
+        }
+        return fullName;
+    }
 }

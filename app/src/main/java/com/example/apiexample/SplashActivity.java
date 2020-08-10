@@ -1,21 +1,26 @@
 package com.example.apiexample;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.LocationManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,30 +34,250 @@ public class SplashActivity extends AppCompatActivity {
     private String mUserId = "";
     private CSVFileReader mCSVFileReader = null;
     private SQLiteDatabaseManager mSQLiteDatabaseManager = null;
-
+    private String mCurrentLocationName = "";
     private ArrayList<LocationInfo> mRegionDataCollections = null;
     private LocationInfoForServer mCurrentLocationInfo = null;
+
+    private ArrayList<String> mManifestPermissionName = null;
+    private ArrayList<String> mPermissionDeniedMessage = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
         initiateVariable();
+
+//        mCSVFileReader = new CSVFileReader(getResources());
+//        mRegionDataCollections = mCSVFileReader.getRegionRealDataCollectionsFromCSVFile();
+//
+//        Geocoder g = new Geocoder(this);
+//
+//        for (LocationInfo locationInfo : mRegionDataCollections) {
+//            Address realAddress = null;
+//            try {
+//                List<Address> a = g.getFromLocation(locationInfo.getLatitudeReal(), locationInfo.getLongitudeReal(), 1);
+//                String bb = "";
+//                if (a.size() > 0) {
+//                    realAddress = a.get(0);
+//                    bb += "inter : " + realAddress.getAddressLine(0);
+////                    System.out.println("inter : " + realAddress.getAddressLine(0));
+//                } else {
+//                    bb += "not exist : " + locationInfo.toString();
+////                    System.out.println("not exist : " + locationInfo.toString());
+//                }
+//
+//                bb += ", excel : " + locationInfo.toString();
+////                System.out.println("excel : " + locationInfo.toString());
+//                System.out.println(bb + "\n");
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        CurrentLocationInformation currentLocationInformation = new CurrentLocationInformation(this);
+//        String a = "";
+//        String b = "";
+//        if (currentLocationInformation.getGPSAddress() == null) {
+//            a = "null 나왔다.";
+//            b = "위도경도없다.";
+//        } else {
+//            a = currentLocationInformation.getGPSAddress().toString();
+//            b = "current longhour : " + (currentLocationInformation.getLongitudeHour())
+//                    + ", longmin : " + (currentLocationInformation.getLongitudeMinute())
+//                    + ", latHOur : " + (currentLocationInformation.getLatitudeHour())
+//                    + ", latMin : " + (currentLocationInformation.getLongitudeMinute());
+//
+//            String fullAddressName = currentLocationInformation.getGPSAddress().getAddressLine(0);
+//        }
+//        System.out.println("fulladdress : " + a);
+//        System.out.println("위도경도 : " + b);
+
+        // cur : 127 61 / 37 6
+//        for (LocationInfo locationInfo : mRegionDataCollections) {
+//            if (locationInfo.getLongitudeHour() != currentLocationInformation.getLatitudeHour()) {
+//                continue;
+//            }
+//
+//            if (locationInfo.getLongitudeMin() != currentLocationInformation.getLongitudeMinute()) {
+//                continue;
+//            }
+//
+//            if (locationInfo.getLatitudeHour() != currentLocationInformation.getLatitudeHour()) {
+//                continue;
+//            }
+//
+//            if (locationInfo.getLatitudeMin() != currentLocationInformation.getLatitudeMinute()) {
+//                continue;
+//            }
+//
+//            System.out.println("locinfo : " + locationInfo.toString() + ", curentLocInfo : " + currentLocationInformation.getGPSAddress().getAddressLine(0));
+//            break;
+//        }
+
+
+//        step1 : 도 / 시
+//        step2 : 구 / 군 / 시
+//        step3 : 동 / 면 / 읍
+//        예외 : 경상북도 울릉군 독도, 제주특별자치도 서귀포시 대정읍/마라도포함
+
+//            mCurrentLocationInfo.setRegionStep1();
+//
+//        int doCount = 0;
+//        int siCount = 0;
+//        int guCount = 0;
+//        int goonCount = 0;
+//        int step2SiCount = 0;
+//        int step2EmptyCount = 0;
+//        int step3EmptyCount = 0;
+//        int dongCount = 0;
+//        int myeonCount = 0;
+//        int eupCount = 0;
+//        int elseCount = 0;
+
+//        for (LocationInfo locationInfo : mRegionDataCollections) {
+//            String step1 = locationInfo.getRegionStep1();
+//            String step2 = locationInfo.getRegionStep2();
+//            String step3 = locationInfo.getRegionStep3();
+//            if (step1.endsWith("도")) {
+//                doCount++;
+////                guCount : 450, goonCount : 860, step2SiCount : 1189
+//            } else if (step1.endsWith("시")) {
+////                guCount : 1176, goonCount : 51, step2SiCount : 20
+//            } else {
+//                System.out.println("step1 : " + locationInfo.toString());
+//                elseCount++;
+//            }
+//        }
+
+//        siCount++;
+//        if (step2.isEmpty()) {
+//
+//        } else if (step2.endsWith("구")) {
+//            guCount++;
+//        } else if (step2.endsWith("군")) {
+//            goonCount++;
+//        } else if (step2.endsWith("시")) {
+//            step2SiCount++;
+//        } else {
+//            System.out.println("step1 도 case : " + locationInfo.toString());
+//            elseCount++;
+//        }
+
+//        for (LocationInfo locationInfo : mRegionDataCollections) {
+//            String step1 = locationInfo.getRegionStep1();
+//            String step2 = locationInfo.getRegionStep2();
+//            String step3 = locationInfo.getRegionStep3();
+//            if (step2.isEmpty()) {
+//                step2EmptyCount++;
+//            } else if (step2.endsWith("구")) {
+//                guCount++;
+//            } else if (step2.endsWith("군")) {
+//                goonCount++;
+//            } else if (step2.endsWith("시")) {
+//                step2SiCount++;
+//            } else {
+//                System.out.println("step2 : " + locationInfo.toString());
+//                elseCount++;
+//            }
+//        }
+//
+//        for (LocationInfo locationInfo : mRegionDataCollections) {
+//            String step1 = locationInfo.getRegionStep1();
+//            String step2 = locationInfo.getRegionStep2();
+//            String step3 = locationInfo.getRegionStep3();
+//            if (step3.isEmpty()) {
+//                step3EmptyCount++;
+//            } else if (step3.endsWith("동")) {
+//                dongCount++;
+//            } else if (step3.endsWith("면")) {
+//                myeonCount++;
+//            } else if (step3.endsWith("읍")) {
+//                eupCount++;
+//            } else {
+//                System.out.println("step3 : " + locationInfo.toString());
+//                elseCount++;
+//            }
+//        }
+
+//        System.out.println("doCount : " + doCount + ", siCount : " +siCount);
+//        System.out.println("guCount : " + guCount + ", goonCount : " +goonCount + ", step2SiCount : " +step2SiCount);
+//        System.out.println("dongCount : " + dongCount + ", myeonCount : " +myeonCount + ", eupCount : " +eupCount);
+//        System.out.println("step2EmptyCount : " + step2EmptyCount + ", step3EmptyCount : " +step3EmptyCount + ", elseCount : " +elseCount);
+
         boolean isAlreadyInitiateFinished = initiateFirstAppInstalled();
         startMainActivity(isAlreadyInitiateFinished);
     }
 
     private void initiateVariable() {
-//        checkPermissions();
         new RestAPIInstance(this);
         SQLiteDatabaseManager.initializeInstance(this);
         mSQLiteDatabaseManager = SQLiteDatabaseManager.getInstance();
         mUserId = PreferenceManager.getString(this, Constant.USER_ID, "NO_ID");
+        mManifestPermissionName = new ArrayList<>();
+        mPermissionDeniedMessage = new ArrayList<>();
+        mManifestPermissionName.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        mPermissionDeniedMessage.add("위치 조회 권한이 거부되었습니다. 허용해주세요.");
+    }
+
+    private boolean initiateFirstAppInstalled() {
+        Log.d("First App Installed", "My app test 1: Start Initiation");
+
+        if (PreferenceManager.getBoolean(this, Constant.IS_INITIATION_FINISHED, false)) {
+            Log.d("First App Installed", "My app test initiate Already Finish");
+            return true;
+        }
+
+        if (!PreferenceManager.getBoolean(this, Constant.IS_GRANT_PERMISSION_FINISHED, false)) {
+            Log.d("First App Installed", "My app test request permissioned start");
+            checkPermissions();
+        } else {
+            Log.d("First App Installed", "My app test request permissioned alreday finish");
+        }
+
+        if (!PreferenceManager.getBoolean(this, Constant.IS_CSV_CONVERTED_TO_DATABASE_FINISHED, false)) {
+            Log.d("First App Installed", "My app test 4: Start CSV CONVERTED");
+            convertFromCSVToDatabase();
+            PreferenceManager.setBoolean(this, Constant.IS_CSV_CONVERTED_TO_DATABASE_FINISHED, true);
+        } else {
+            Log.d("First App Installed", "My app test : Already CSV CONVERTED");
+        }
+
+        if (!PreferenceManager.getBoolean(this, Constant.IS_CREATE_LOCATION_ID_TABLE_FINISHED, false)) {
+            Log.d("First App Installed", "My app test Start 6: Create Location id table Start");
+            mSQLiteDatabaseManager.createLocationIdTable();
+            PreferenceManager.setBoolean(this, Constant.IS_CREATE_LOCATION_ID_TABLE_FINISHED, true);
+        } else {
+            Log.d("First App Installed", "My app test Already Finished : Create Location id table");
+        }
+
+        setIsFinished();
+        return false;
+    }
+
+    private void setIsFinished() {
+        if (PreferenceManager.getBoolean(this, Constant.IS_CSV_CONVERTED_TO_DATABASE_FINISHED, false)
+                && PreferenceManager.getBoolean(this, Constant.IS_GET_USER_ID_FINISHED, false)
+                && PreferenceManager.getBoolean(this, Constant.IS_CREATE_MY_REGION_TABLE_FINISHED, false)
+                && PreferenceManager.getBoolean(this, Constant.IS_CREATE_LOCATION_ID_TABLE_FINISHED, false)
+                && PreferenceManager.getBoolean(this, Constant.IS_CREATE_FORECAST_INFORMATION_TABLE_FINISHED, false)
+                && PreferenceManager.getBoolean(this, Constant.IS_GRANT_PERMISSION_FINISHED, false)
+        ) {
+            PreferenceManager.setBoolean(this, Constant.IS_INITIATION_FINISHED, true);
+            Log.d("First App Installed", "My app test 7 sync: Now Initiation finished");
+        } else {
+            Log.d("First App Installed", "My app test 7 sync: not ok at initiation");
+        }
     }
 
     private void checkPermissions() {
-        checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, "위치 조회 권한이 거부되었습니다. 허용해주세요.");
-        checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, "위치 조회 권한2가 거부되었습니다. 허용해주세요.");
+        int remainManifestPermissionSize = mManifestPermissionName.size();
+        if (remainManifestPermissionSize == 0) {
+            return;
+        }
+
+        checkPermission(mManifestPermissionName.get(0), mPermissionDeniedMessage.get(0));
     }
 
     private void checkPermission(String permissionName, String needPermissionMessage){
@@ -60,7 +285,7 @@ public class SplashActivity extends AppCompatActivity {
             System.out.println("my app test grant alreday");
             return;
         }
-//        "저장소 권한이 거부되었습니다. 사용을 원하시면 설정에서 해당 권한을 직접 허용하셔야 합니다."
+//        "권한이 거부되었습니다. 사용을 원하시면 설정에서 해당 권한을 직접 허용하셔야 합니다."
         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissionName)) {
             System.out.println("my app test else statement start");
             ActivityCompat.requestPermissions(this, new String[]{permissionName}, Constant.MY_PERMISSION_STORAGE);
@@ -90,28 +315,57 @@ public class SplashActivity extends AppCompatActivity {
                 .show();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
-    private boolean initiateFirstAppInstalled() {
-        Log.d("First App Installed", "My app test 1: Start Initiation");
+        Log.d("First App Installed", "My app test Constant.requestCode : " + Constant.MY_PERMISSION_STORAGE + ", received requestCode : " + requestCode);
+        Log.d("First App Installed", "My app test permissions.length : " + permissions.length);
+        for (String permission : permissions) {
+            Log.d("First App Installed", "My app test permission : " + permission);
+        }
 
-        if (PreferenceManager.getBoolean(this, Constant.IS_INITIATION_FINISHED, false)) {
-            Log.d("First App Installed", "My app test initiate Already Finish");
+        Log.d("First App Installed", "My app test permission_granted grantResult : " + PackageManager.PERMISSION_GRANTED);
+        Log.d("First App Installed", "My app test grantResults.length : " + grantResults.length);
+        for (int grantResult : grantResults) {
+            Log.d("First App Installed", "My app test grantResult : " + grantResult);
+        }
 
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }.start();
+        if (requestCode != Constant.MY_PERMISSION_STORAGE) {
+            Log.d("First App Installed", "My app test requestCode != my_permission_storage");
+            return;
+        }
 
-            return true;
+        if (grantResults.length <= 0) {
+            Log.d("First App Installed", "My app test grantResults.length <= 0");
+            return;
+        }
+
+        if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+            Log.d("First App Installed", "My app test grantresults[0] != packagemanager.permission_granted");
+            return;
+        }
+
+        Log.d("First App Installed", "My app test Permission Success");
+        PreferenceManager.incrementGrantedPermissionCount(this);
+
+        if (mManifestPermissionName.size() > 0) {
+            mManifestPermissionName.remove(0);
+            mPermissionDeniedMessage.remove(0);
+        }
+
+        if (mManifestPermissionName.size() > 0) {
+            checkPermissions();
+            return;
+        }
+
+        if (PreferenceManager.getInt(this, Constant.GRANT_PERMISSION_COUNT) == Constant.GRANTED_PERMISSION_NEEDED_COUNT) {
+            PreferenceManager.setBoolean(this, Constant.IS_GRANT_PERMISSION_FINISHED, true);
+        } else {
+            PreferenceManager.setBoolean(this, Constant.IS_GRANT_PERMISSION_FINISHED, false);
+        }
+
+        if (!PreferenceManager.getBoolean(this, Constant.IS_GRANT_PERMISSION_FINISHED, false)) {
+            return;
         }
 
         if (!PreferenceManager.getBoolean(this, Constant.IS_GET_USER_ID_FINISHED, false)) {
@@ -121,35 +375,6 @@ public class SplashActivity extends AppCompatActivity {
         } else {
             Log.d("First App Installed", "My app test : Already GET USER ID : " + PreferenceManager.getString(this, Constant.USER_ID));
         }
-
-        if (!PreferenceManager.getBoolean(this, Constant.IS_CSV_CONVERTED_TO_DATABASE_FINISHED, false)) {
-            Log.d("First App Installed", "My app test 4: Start CSV CONVERTED");
-            convertFromCSVToDatabase();
-            PreferenceManager.setBoolean(this, Constant.IS_CSV_CONVERTED_TO_DATABASE_FINISHED, true);
-        } else {
-            Log.d("First App Installed", "My app test : Already CSV CONVERTED");
-        }
-
-        if (!PreferenceManager.getBoolean(this, Constant.IS_CREATE_LOCATION_ID_TABLE_FINISHED, false)) {
-            Log.d("First App Installed", "My app test Start 6: Create Location id table Start");
-            mSQLiteDatabaseManager.createLocationIdTable();
-            PreferenceManager.setBoolean(this, Constant.IS_CREATE_LOCATION_ID_TABLE_FINISHED, true);
-        } else {
-            Log.d("First App Installed", "My app test Already Finished : Create Location id table");
-        }
-
-        if (PreferenceManager.getBoolean(this, Constant.IS_CSV_CONVERTED_TO_DATABASE_FINISHED, false)
-                && PreferenceManager.getBoolean(this, Constant.IS_GET_USER_ID_FINISHED, false)
-                && PreferenceManager.getBoolean(this, Constant.IS_CREATE_MY_REGION_TABLE_FINISHED, false)
-                && PreferenceManager.getBoolean(this, Constant.IS_CREATE_LOCATION_ID_TABLE_FINISHED, false)
-                && PreferenceManager.getBoolean(this, Constant.IS_CREATE_FORECAST_INFORMATION_TABLE_FINISHED, false)
-        ) {
-            PreferenceManager.setBoolean(this, Constant.IS_INITIATION_FINISHED, true);
-            Log.d("First App Installed", "My app test 7 sync: Now Initiation finished");
-        } else {
-            Log.d("First App Installed", "My app test 7 sync: not ok at initiation");
-        }
-        return false;
     }
 
     private void createUser(String userId) {
@@ -201,24 +426,48 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void AddCurrentLocation() {
-//        GPSInformation gpsInformation = new GPSInformation(SplashActivity.this);
+        CurrentLocationInformation currentLocationInformation = new CurrentLocationInformation(this);
 
         mCurrentLocationInfo = new LocationInfoForServer();
-        String a = "";
-//        if (gpsInformation.getGPSAddress() == null) {
-//            a = "null 나왔다.";
-            mCurrentLocationInfo.setRegionStep1("경기도");
-            mCurrentLocationInfo.setRegionStep2("성남시분당구");
-            mCurrentLocationInfo.setRegionStep3("금곡동");
-//        } else {
-//            a = gpsInformation.getGPSAddress().toString();
-//            mCurrentLocationInfo.setLongitudeHour(gpsInformation.getLongitudeHour());
-//            mCurrentLocationInfo.setLongitudeMin(gpsInformation.getLongitudeMinute());
-//            mCurrentLocationInfo.setLatitudeHour(gpsInformation.getLatitudeHour());
-//            mCurrentLocationInfo.setLongitudeMin(gpsInformation.getLongitudeMinute());
-//        }
+        String addressString = "";
+        if (currentLocationInformation.getGPSAddress() == null) {
+            addressString += "위치 정보 null";
+            mCurrentLocationInfo.setLongitudeHour(Constant.NOT_EXIST_REGION_COORDINATE);
+            mCurrentLocationInfo.setLongitudeMin(Constant.NOT_EXIST_REGION_COORDINATE);
+            mCurrentLocationInfo.setLatitudeHour(Constant.NOT_EXIST_REGION_COORDINATE);
+            mCurrentLocationInfo.setLongitudeMin(Constant.NOT_EXIST_REGION_COORDINATE);
+            mCurrentLocationName = "대한민국";
+//            mCurrentLocationInfo.setRegionStep1("경기도");
+//            mCurrentLocationInfo.setRegionStep2("성남시분당구");
+//            mCurrentLocationInfo.setRegionStep3("금곡동");
+        } else {
+            Address currentAddress = currentLocationInformation.getGPSAddress();
+            String fullBody = "";
+            String fullAddressName = "";
+            if (currentAddress == null) {
+                fullBody = "current Address Full Body No Name";
+                fullAddressName = "full Address Name No Name";
+            } else {
+                fullBody = currentAddress.toString();
+                fullAddressName = currentAddress.getAddressLine(0);
+            }
+            mCurrentLocationInfo.setLongitudeHour(currentLocationInformation.getLongitudeHour());
+            mCurrentLocationInfo.setLongitudeMin(currentLocationInformation.getLongitudeMinute());
+            mCurrentLocationInfo.setLatitudeHour(currentLocationInformation.getLatitudeHour());
+            mCurrentLocationInfo.setLongitudeMin(currentLocationInformation.getLongitudeMinute());
 
-        Log.d("First App Installed", "My app test GPS : " + a);
+            addressString += "fullBody : " + fullBody + ", fullAddressName : " + fullAddressName;
+            mCurrentLocationName = Utils.getFormattedLocationNameFromFullName(mCurrentLocationName);
+
+//        step1 : 도 / 시
+//        step2 : 구 / 군 / 시
+//        step3 : 동 / 면 / 읍
+//        예외 : 경상북도 울릉군 독도, 제주특별자치도 서귀포시 대정읍/마라도포함
+
+//            mCurrentLocationInfo.setRegionStep1();
+        }
+
+        Log.d("First App Installed", "My app test current address : " + addressString);
         postRequestAddCurrentLocation();
     }
 
@@ -235,9 +484,9 @@ public class SplashActivity extends AppCompatActivity {
             if(response.isSuccessful()) {
                 if (response.body().intValue() == 0) {
                     Log.d("First App Installed", "My app test Start add location current success");
-                    mCurrentLocationInfo.setRegionStep1("경기도");
-                    mCurrentLocationInfo.setRegionStep2("성남시분당구");
-                    mCurrentLocationInfo.setRegionStep3("금곡동");
+                    mCurrentLocationInfo.setRegionStep1(mCurrentLocationName);
+                    mCurrentLocationInfo.setRegionStep2("");
+                    mCurrentLocationInfo.setRegionStep3("");
                     mSQLiteDatabaseManager.addMyRegionData(new LocationInfo(mCurrentLocationInfo));
                     createForecastInformationTable();
                     getCurrentLocalWeather();
@@ -285,14 +534,8 @@ public class SplashActivity extends AppCompatActivity {
                     break;
                 }
 
-                if (PreferenceManager.getBoolean(SplashActivity.this, Constant.IS_CSV_CONVERTED_TO_DATABASE_FINISHED, false)
-                        && PreferenceManager.getBoolean(SplashActivity.this, Constant.IS_GET_USER_ID_FINISHED, false)
-                        && PreferenceManager.getBoolean(SplashActivity.this, Constant.IS_CREATE_MY_REGION_TABLE_FINISHED, false)
-                        && PreferenceManager.getBoolean(SplashActivity.this, Constant.IS_CREATE_LOCATION_ID_TABLE_FINISHED, false)
-                        && PreferenceManager.getBoolean(SplashActivity.this, Constant.IS_CREATE_FORECAST_INFORMATION_TABLE_FINISHED, false)
-                ) {
-                    PreferenceManager.setBoolean(SplashActivity.this, Constant.IS_INITIATION_FINISHED, true);
-                    Log.d("First App Installed", "My app test 7 async: Now Initiation finished");
+                setIsFinished();
+                if (PreferenceManager.getBoolean(SplashActivity.this, Constant.IS_INITIATION_FINISHED, false)) {
                     close();
                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                     startActivity(intent);

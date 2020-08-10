@@ -40,6 +40,10 @@ public class LocationInfo implements Serializable{
         this(regionStep1, regionStep2, regionStep3, 0, 0, 0, 0, isGlobalRegion, locationId);
     }
 
+    public LocationInfo(String regionStep1, String regionStep2, String regionStep3, int longitudeHour, int longitudeMin, int latitudeHour, int latitudeMin) {
+        this(regionStep1, regionStep2, regionStep3, longitudeHour, longitudeMin, latitudeHour, latitudeMin, false, -1);
+    }
+
     public LocationInfo(String regionStep1, String regionStep2, String regionStep3, int longitudeHour, int longitudeMin, int latitudeHour, int latitudeMin, boolean isGlobalRegion, int locationId) {
         this.regionStep1 = regionStep1;
         this.regionStep2 = regionStep2;
@@ -143,6 +147,18 @@ public class LocationInfo implements Serializable{
         }
 
         return regionFullName;
+    }
+
+    private double longitudeReal, latitudeReal;
+    public double getLongitudeReal () { return longitudeReal; }
+    public double getLatitudeReal () { return latitudeReal; }
+
+    public LocationInfo(String regionStep1, String regionStep2, String regionStep3, double longitudeReal, double latitudeReal) {
+        this.regionStep1 = regionStep1;
+        this.regionStep2 = regionStep2;
+        this.regionStep3 = regionStep3;
+        this.longitudeReal = longitudeReal;
+        this.latitudeReal = latitudeReal;
     }
 }
 

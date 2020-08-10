@@ -18,7 +18,8 @@ public class Constant {
     public static final String IS_CREATE_MY_REGION_TABLE_FINISHED = "IS_CREATE_MY_REGION_TABLE_FINISHED";
     public static final String IS_CREATE_LOCATION_ID_TABLE_FINISHED = "IS_CREATE_LOCATION_ID_TABLE_FINISHED";
     public static final String IS_CREATE_FORECAST_INFORMATION_TABLE_FINISHED = "IS_CREATE_FORECAST_INFORMATION_TABLE_FINISHED";
-    public static final String IS_GET_PERMISSION_FINISHED = "IS_GET_PERMISSION_FINISHED";
+    public static final String IS_GRANT_PERMISSION_FINISHED = "IS_GRANT_PERMISSION_FINISHED";
+    public static final String GRANT_PERMISSION_COUNT = "GRANT_PERMISSION_COUNT";
     public static final String USER_ID = "USER_ID";
 
     public static final String MY_REGION_COUNT = "MY_REGION_COUNT";
@@ -31,6 +32,7 @@ public class Constant {
     public static final int ADD_LOCATION_RESULT_SUCCESS_CODE = 2;
     public static final int CHANGE_LOCATION_REQUEST_CODE = 3;
     public static final int CHANGE_LOCATION_REQUEST_SUCCESS_CODE = 4;
-
+    public static final int GRANTED_PERMISSION_NEEDED_COUNT = 1;
     public static final int CURRENT_LOCATION_ID = 0;
+    public static final int NOT_EXIST_REGION_COORDINATE = -1;
 }
