@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.viewpager.widget.PagerAdapter;
 
 import java.text.SimpleDateFormat;
@@ -16,14 +17,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Random;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TextViewPagerAdapter extends PagerAdapter {
 
@@ -40,8 +39,8 @@ public class TextViewPagerAdapter extends PagerAdapter {
     public TextViewPagerAdapter(Context context, MainActivity parentActivity) {
         this.mContext = context;
         this.parentActivity = parentActivity;
-        this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_REGION_COUNT) + 1;
-        this.mMyLocationInfoList = SQLiteDatabaseManager.getInstance().getMyAddedRegionDataList(false);
+        this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_ONLY_ADDED_REGION_COUNT) + 1;
+        this.mMyLocationInfoList = SQLiteDatabaseManager.getInstance().getMyRegionIncludingCurrentLocationList(false);
         this.mRetrofit = RestAPIInstance.getInstance();
     }
 
@@ -56,8 +55,8 @@ public class TextViewPagerAdapter extends PagerAdapter {
     }
 
     protected void setDataChanged() {
-        this.mMyLocationInfoList = SQLiteDatabaseManager.getInstance().getMyAddedRegionDataList(false);
-        this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_REGION_COUNT) + 1;
+        this.mMyLocationInfoList = SQLiteDatabaseManager.getInstance().getMyRegionIncludingCurrentLocationList(false);
+        this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_ONLY_ADDED_REGION_COUNT) + 1;
         this.notifyDataSetChanged();
     }
 
@@ -69,9 +68,9 @@ public class TextViewPagerAdapter extends PagerAdapter {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             mView = inflater.inflate(R.layout.page, container, false);
 
-            mView.findViewById(R.id.hereThirdImage).setOnClickListener(new View.OnClickListener() {
+            mView.findViewById(R.id.btn_open_edit_page).setOnClickListener(new OnCustomClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onSingleClick(View v) {
                     Intent intent = new Intent(mContext, AddLocationActivity.class);
                     parentActivity.startActivityForResult(intent, Constant.CHANGE_LOCATION_REQUEST_CODE);
 
@@ -95,15 +94,44 @@ public class TextViewPagerAdapter extends PagerAdapter {
             ((TextView) mView.findViewById(R.id.currentLocation)).setText(locationInfo.toString());
             ((TextView)mView.findViewById(R.id.updateTime)).setText(str);
 
-            ForecastInformation forecastInformation = SQLiteDatabaseManager.getInstance().getForcastInformation(locationInfo.getLocationId());
+            ForecastInformation forecastInformation = SQLiteDatabaseManager.getInstance().getForecastInformation(locationInfo.getLocationId());
 
             if (forecastInformation.isRainy()) {
                 ((TextView)mView.findViewById(R.id.rain_text)).setText("비 온다");
-                ((ImageView)mView.findViewById(R.id.imageCenter)).setImageResource(R.mipmap.ic_launcher_round);
+                ((AppCompatImageView)mView.findViewById(R.id.imageCenter)).setImageResource(R.drawable.ic_umbrella);
             } else {
                 ((TextView)mView.findViewById(R.id.rain_text)).setText("비 안 온다");
-                ((ImageView)mView.findViewById(R.id.imageCenter)).setImageResource(R.drawable.splash);
+                ((AppCompatImageView)mView.findViewById(R.id.imageCenter)).setImageResource(R.drawable.ic_sun);
             }
+
+            ((AppCompatImageView)mView.findViewById(R.id.imageCenter)).setOnClickListener(new OnCustomClickListener() {
+                @Override
+                public void onSingleClick(View v) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ArrayList drawableList = new ArrayList();
+                            drawableList.add(R.drawable.ic_icon_emoji_1);
+                            drawableList.add(R.drawable.ic_icon_emoji_2);
+                            drawableList.add(R.drawable.ic_icon_emoji_3);
+                            drawableList.add(R.drawable.ic_icon_emoji_4);
+                            int randomDrawableId = (int) drawableList.get(new Random().nextInt(drawableList.size()));
+                            ((AppCompatImageView)v).setImageResource(randomDrawableId);
+
+                            try {
+                                Thread.sleep(200);
+                                if (forecastInformation.isRainy()) {
+                                    ((AppCompatImageView)v).setImageResource(R.drawable.ic_umbrella);
+                                } else {
+                                    ((AppCompatImageView)v).setImageResource(R.drawable.ic_sun);
+                                }
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
+            });
         }
 
 //        for (int i = 1; i <= 5; i++) {
@@ -163,7 +191,7 @@ public class TextViewPagerAdapter extends PagerAdapter {
                 String resultText = "";
                 for (LinkedHashMap responseElement : responseBody) {
                     int locationId = responseElement.get("locationId").toString().charAt(0) - '0';
-                    LocationInfo locationInfo = SQLiteDatabaseManager.getInstance().getMyRegionData(locationId);
+                    LocationInfo locationInfo = SQLiteDatabaseManager.getInstance().getMyRegionDataFromRegionIncludingCurrentLocationTable(locationId);
                     String currentText = "[" + locationInfo.getLocationId() + "] "
                             + locationInfo.toString() + ", uid : " + responseElement.get("uid")
                             + ", rn1 : " + responseElement.get("precipitation")

@@ -18,28 +18,33 @@
         app:layout_constraintRight_toRightOf="parent"
         >
         <ImageView
-            android:id="@+id/firstImage"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:src="@drawable/menu"
+            android:id="@+id/btn_back_at_add_location_page"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
+            android:padding="7dp"
+            app:srcCompat="@drawable/ic_menu_24px"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <ImageView
-            android:id="@+id/secondImage"
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/title_at_add_location_page"
+            android:padding="8dp"
             android:layout_width="50dp"
-            android:layout_height="match_parent"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/ic_share_24px"
             android:background="@android:color/transparent"
-            app:layout_constraintRight_toLeftOf="@+id/hereThirdImage"
+            app:layout_constraintRight_toLeftOf="@id/btn_open_edit_page"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/hereThirdImage"
+            android:id="@+id/btn_open_edit_page"
+            android:padding="8dp"
             android:layout_width="50dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginRight="5dp"
             app:srcCompat="@drawable/ic_add_24px"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -90,12 +95,12 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/currentLocation" />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageCenter"
-            android:layout_margin="50dp"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:src="@mipmap/ic_launcher_round"
+            android:layout_margin="60dp"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            app:srcCompat="@drawable/ic_umbrella"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/updateTime"
@@ -110,7 +115,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageCenter"
-            android:layout_margin="20dp"
+            android:layout_marginTop="50dp"
             android:textSize="50dp"
             />
 

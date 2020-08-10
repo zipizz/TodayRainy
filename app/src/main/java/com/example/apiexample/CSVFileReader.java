@@ -36,12 +36,13 @@ public class CSVFileReader {
                 String regionOneStep = CSVColumnData[2];
                 String regionTwoStep = CSVColumnData[3];
                 String regionThreeStep = CSVColumnData[4];
-                int longitudeHour = Integer.parseInt(CSVColumnData[7]);
-                int longitudeMin = Integer.parseInt(CSVColumnData[8]);
-                int latitudeHour = Integer.parseInt(CSVColumnData[10]);
-                int latitudeMin = Integer.parseInt(CSVColumnData[11]);
+//                int longitudeHour = Integer.parseInt(CSVColumnData[7]);
+//                int longitudeMin = Integer.parseInt(CSVColumnData[8]);
+//                int latitudeHour = Integer.parseInt(CSVColumnData[10]);
+//                int latitudeMin = Integer.parseInt(CSVColumnData[11]);
 
-                regionDataCollections.add(new LocationInfo(regionOneStep, regionTwoStep, regionThreeStep, longitudeHour, longitudeMin, latitudeHour, latitudeMin));
+//                regionDataCollections.add(new LocationInfo(regionOneStep, regionTwoStep, regionThreeStep, longitudeHour, longitudeMin, latitudeHour, latitudeMin));
+                regionDataCollections.add(new LocationInfo(regionOneStep, regionTwoStep, regionThreeStep));
             }
         } catch (IOException ioe) {
             Log.d("", ioe.getMessage());

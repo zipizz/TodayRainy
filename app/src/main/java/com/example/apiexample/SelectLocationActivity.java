@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import java.util.HashMap;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -49,7 +47,7 @@ public class SelectLocationActivity extends AppCompatActivity {
 
     public void postRequestAddLocation() {
         System.out.println("My app test postRequestAddLocation function in");
-        mSelectedLocationId = mSQLiteDatabaseManager.getLocationIdMin();
+        mSelectedLocationId = mSQLiteDatabaseManager.getRemainLocationIdMin();
         if (mSelectedLocationId == Constant.LOCATION_ID_NOT_EXIST) {
             System.out.println("My app test add location fail because not exist usable location id any more");
             return;
@@ -60,7 +58,7 @@ public class SelectLocationActivity extends AppCompatActivity {
             return;
         }
 
-        if (mSQLiteDatabaseManager.hasLocation(mSelectedLocationInfo)) {
+        if (mSQLiteDatabaseManager.hasLocationInMyRegionDataIncludingCurrentLocationTable(mSelectedLocationInfo)) {
             System.out.println("My app test add location fail because Already region exist");
             Toast.makeText(this, "이미 추가된 지역입니다.", Toast.LENGTH_SHORT).show();
             return;
@@ -91,8 +89,8 @@ public class SelectLocationActivity extends AppCompatActivity {
                 if(responseCode == 0) {
                     System.out.println("My app test add location : response code success");
                     mSelectedLocationInfo.setLocationId(mSelectedLocationId);
-                    mSQLiteDatabaseManager.addMyRegionData(mSelectedLocationInfo);
-                    mSQLiteDatabaseManager.deleteLocationId(mSelectedLocationId);
+                    mSQLiteDatabaseManager.addMyRegionDataIntoRegionIncludingCurrentLocationTable(mSelectedLocationInfo);
+                    mSQLiteDatabaseManager.deleteLocationIdFromRemainLocationIdTable(mSelectedLocationId);
                     PreferenceManager.incrementMyRegionCount(SelectLocationActivity.this);
                     Intent intent = new Intent();
                     intent.putExtra("hasAddedRegion", true);

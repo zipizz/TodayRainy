@@ -6,11 +6,8 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ListView;
@@ -36,12 +33,13 @@ public class AddLocationActivity extends AppCompatActivity {
     private EditLocationOrderListViewAdapter mEditLocationOrderListViewAdapter = null;
     private ArrayList<LocationInfo> mCustomArrayList = new ArrayList<LocationInfo>();
     private Retrofit mRetrofit = null;
-    private AppCompatImageButton mEditOrderButton = null;
+    private TextView mEditOrderButton = null;
     private Button mAddLocationButton = null;
     private ArrayList mSelectedDeleteLocationId = new ArrayList();
     private int mDeleteLocationId = -1;
     private TextView mSelectedLocationCountView = null;
     private boolean mIsEditMode = false;
+    private boolean mIsEditButtonClickedAtLeastOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +47,7 @@ public class AddLocationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_location);
 
 //        mCustomArrayList.add(new ForecastInformation("1.0", "99.0", "9.5", "1596799679948", 1));
-        mCustomArrayList = SQLiteDatabaseManager.getInstance().getMyAddedRegionDataList(false);
+        mCustomArrayList = SQLiteDatabaseManager.getInstance().getMyRegionIncludingCurrentLocationList(false);
         if (mCustomArrayList.size() == 0) {
 //            TextView noneRegionNotifyView = new TextView();
 //            noneRegionNotifyView.setText("지역이 없네요");
@@ -59,7 +57,7 @@ public class AddLocationActivity extends AppCompatActivity {
         }
 
         mListView = (ListView) findViewById(R.id.listofmyregion);
-        mAddLocationListViewAdapter = new AddLocationListViewAdapter(this, mCustomArrayList);
+        mAddLocationListViewAdapter = new AddLocationListViewAdapter(this, mCustomArrayList, this);
         mEditLocationOrderListViewAdapter = new EditLocationOrderListViewAdapter(this, mCustomArrayList, this);
         mSelectedLocationCountView = (TextView) findViewById(R.id.selected_location_count);
         mListView.setAdapter(mAddLocationListViewAdapter);
@@ -68,21 +66,28 @@ public class AddLocationActivity extends AppCompatActivity {
         ConstraintLayout view = (ConstraintLayout)findViewById(R.id.delete_constraint);
         view.setVisibility(View.INVISIBLE);
         mAddLocationButton = ((Button) findViewById(R.id.add_location_btn));
-        mEditOrderButton = ((AppCompatImageButton) findViewById(R.id.thirdImage));
-        mEditOrderButton.setImageResource(R.drawable.ic_edit_24px);
+        mEditOrderButton = ((TextView) findViewById(R.id.thirdImage));
+        mEditOrderButton.setText("편집");
         mEditOrderButton.setTag(R.drawable.ic_edit_24px);
 
+        findViewById(R.id.btn_back_at_add_location_page).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddLocationActivity.super.onBackPressed();
+            }
+        });
         mEditOrderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mIsEditButtonClickedAtLeastOnce = true;
                 if ((int) mEditOrderButton.getTag() == R.drawable.ic_edit_24px) {
-                    mEditOrderButton.setImageResource(R.drawable.ic_check_black_24dp);
+                    mEditOrderButton.setText("완료");
                     mEditOrderButton.setTag(R.drawable.ic_check_black_24dp);
                     mListView.setAdapter(mEditLocationOrderListViewAdapter);
                     mAddLocationButton.setVisibility(View.INVISIBLE);
                     mIsEditMode = true;
                 } else {
-                    mEditOrderButton.setImageResource(R.drawable.ic_edit_24px);
+                    mEditOrderButton.setText("편집");
                     mEditOrderButton.setTag(R.drawable.ic_edit_24px);
                     mListView.setAdapter(mAddLocationListViewAdapter);
                     mAddLocationButton.setVisibility(View.VISIBLE);
@@ -107,10 +112,10 @@ public class AddLocationActivity extends AppCompatActivity {
 //            }
 //        });
 
-        ((Button) findViewById(R.id.add_location_btn)).setOnClickListener(new View.OnClickListener() {
+        mAddLocationButton.setOnClickListener(new OnCustomClickListener() {
             @Override
-            public void onClick(View v) {
-                if (PreferenceManager.getInt(AddLocationActivity.this, Constant.MY_REGION_COUNT) < Constant.MAX_MY_ADD_LOCATION_COUNT) {
+            public void onSingleClick(View v) {
+                if (PreferenceManager.getInt(AddLocationActivity.this, Constant.MY_ONLY_ADDED_REGION_COUNT) < Constant.MAX_MY_ONLY_ADDED_LOCATION_COUNT) {
                     Intent intent = new Intent(AddLocationActivity.this, SelectLocationActivity.class);
                     startActivityForResult(intent, Constant.ADD_LOCATION_REQUEST_CODE);
 //                    startActivity(intent);
@@ -120,12 +125,16 @@ public class AddLocationActivity extends AppCompatActivity {
             }
         });
 
-        ((ConstraintLayout) findViewById(R.id.delete_touch_area)).setOnClickListener(new View.OnClickListener() {
+        ((ConstraintLayout) findViewById(R.id.delete_touch_area)).setOnClickListener(new OnCustomClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 deleteLocation();
             }
         });
+    }
+
+    protected boolean isEditButtonClickedAtLeastOnce () {
+        return mIsEditButtonClickedAtLeastOnce;
     }
 
     public void slideClear() {
@@ -177,7 +186,7 @@ public class AddLocationActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if(mIsEditMode) {
-            mEditOrderButton.setImageResource(R.drawable.ic_edit_24px);
+            mEditOrderButton.setText("편집");
             mEditOrderButton.setTag(R.drawable.ic_edit_24px);
             mListView.setAdapter(mAddLocationListViewAdapter);
             mAddLocationButton.setVisibility(View.VISIBLE);
@@ -197,7 +206,7 @@ public class AddLocationActivity extends AppCompatActivity {
         }
 
         if (mSelectedDeleteLocationId.size() == 0) {
-            mCustomArrayList = SQLiteDatabaseManager.getInstance().getMyAddedRegionDataList(false);
+            mCustomArrayList = SQLiteDatabaseManager.getInstance().getMyRegionIncludingCurrentLocationList(false);
             mAddLocationListViewAdapter.clear();
             mAddLocationListViewAdapter.addAll(mCustomArrayList);
             mAddLocationListViewAdapter.notifyDataSetChanged();
@@ -205,7 +214,7 @@ public class AddLocationActivity extends AppCompatActivity {
             mEditLocationOrderListViewAdapter.addAll(mCustomArrayList);
             mEditLocationOrderListViewAdapter.notifyDataSetChanged();
 
-            mEditOrderButton.setImageResource(R.drawable.ic_edit_24px);
+            mEditOrderButton.setText("편집");
             mEditOrderButton.setTag(R.drawable.ic_edit_24px);
             mListView.setAdapter(mAddLocationListViewAdapter);
             mAddLocationButton.setVisibility(View.VISIBLE);
@@ -230,8 +239,8 @@ public class AddLocationActivity extends AppCompatActivity {
                 int responseCode = response.body().intValue();
                 if(responseCode == 0) {
                     System.out.println("My app test delete location : response code success");
-                    SQLiteDatabaseManager.getInstance().deleteMyRegionData(mDeleteLocationId);
-                    SQLiteDatabaseManager.getInstance().addLocationId(mDeleteLocationId);
+                    SQLiteDatabaseManager.getInstance().deleteMyRegionDataFromRegionIncludingCurrentLocationTable(mDeleteLocationId);
+                    SQLiteDatabaseManager.getInstance().addLocationIdIntoRemainLocationIdTable(mDeleteLocationId);
                     PreferenceManager.decrementMyRegionCount(AddLocationActivity.this);
                     deleteLocation();
                 } else {
@@ -285,7 +294,7 @@ public class AddLocationActivity extends AppCompatActivity {
                 if(!data.getExtras().getBoolean("hasAddedRegion")) {
                     return;
                 };
-                mCustomArrayList = SQLiteDatabaseManager.getInstance().getMyAddedRegionDataList(false);
+                mCustomArrayList = SQLiteDatabaseManager.getInstance().getMyRegionIncludingCurrentLocationList(false);
                 mAddLocationListViewAdapter.clear();
                 mAddLocationListViewAdapter.addAll(mCustomArrayList);
                 mAddLocationListViewAdapter.notifyDataSetChanged();
@@ -343,7 +352,7 @@ public class AddLocationActivity extends AppCompatActivity {
 
                 for (LinkedHashMap responseElement : responseBody) {
                     int locationId = responseElement.get("locationId").toString().charAt(0) - '0';
-                    LocationInfo locationInfo = SQLiteDatabaseManager.getInstance().getMyRegionData(locationId);
+                    LocationInfo locationInfo = SQLiteDatabaseManager.getInstance().getMyRegionDataFromRegionIncludingCurrentLocationTable(locationId);
                     String currentText = "[" + locationInfo.getLocationId() + "] "
                             + locationInfo.toString() + ", uid : " + responseElement.get("uid")
                             + ", rn1 : " + responseElement.get("precipitation")

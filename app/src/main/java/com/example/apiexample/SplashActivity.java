@@ -1,13 +1,10 @@
 package com.example.apiexample;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
-import android.location.Geocoder;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -20,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -246,7 +242,7 @@ public class SplashActivity extends AppCompatActivity {
 
         if (!PreferenceManager.getBoolean(this, Constant.IS_CREATE_LOCATION_ID_TABLE_FINISHED, false)) {
             Log.d("First App Installed", "My app test Start 6: Create Location id table Start");
-            mSQLiteDatabaseManager.createLocationIdTable();
+            mSQLiteDatabaseManager.createRemainLocationIdTable();
             PreferenceManager.setBoolean(this, Constant.IS_CREATE_LOCATION_ID_TABLE_FINISHED, true);
         } else {
             Log.d("First App Installed", "My app test Already Finished : Create Location id table");
@@ -287,6 +283,7 @@ public class SplashActivity extends AppCompatActivity {
         }
 //        "권한이 거부되었습니다. 사용을 원하시면 설정에서 해당 권한을 직접 허용하셔야 합니다."
         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissionName)) {
+            // 처음 시작하면 여기 들어감.
             System.out.println("my app test else statement start");
             ActivityCompat.requestPermissions(this, new String[]{permissionName}, Constant.MY_PERMISSION_STORAGE);
             return;
@@ -411,7 +408,7 @@ public class SplashActivity extends AppCompatActivity {
     private void createMyLocationTable() {
         if (!PreferenceManager.getBoolean(this, Constant.IS_CREATE_MY_REGION_TABLE_FINISHED, false)) {
             Log.d("First App Installed", "My app test Start 5: Create my region table Start");
-            mSQLiteDatabaseManager.createMyRegionDataDB();
+            mSQLiteDatabaseManager.createMyRegionIncludingCurrentLocationTable();
             PreferenceManager.setBoolean(this, Constant.IS_CREATE_MY_REGION_TABLE_FINISHED, true);
         } else {
             Log.d("First App Installed", "My app test Already Finished : Create my region table ");
@@ -421,8 +418,8 @@ public class SplashActivity extends AppCompatActivity {
     private void convertFromCSVToDatabase() {
         mCSVFileReader = new CSVFileReader(getResources());
         mRegionDataCollections = mCSVFileReader.getRegionDataCollectionsFromCSVFile();
-        mSQLiteDatabaseManager.createRegionDataDB(mRegionDataCollections);
-        mSQLiteDatabaseManager.showRegionDataDB();
+        mSQLiteDatabaseManager.createRegionCSVTable(mRegionDataCollections);
+        mSQLiteDatabaseManager.showRegionDataListFromCSVTable();
     }
 
     private void AddCurrentLocation() {
@@ -451,13 +448,22 @@ public class SplashActivity extends AppCompatActivity {
                 fullBody = currentAddress.toString();
                 fullAddressName = currentAddress.getAddressLine(0);
             }
-            mCurrentLocationInfo.setLongitudeHour(currentLocationInformation.getLongitudeHour());
-            mCurrentLocationInfo.setLongitudeMin(currentLocationInformation.getLongitudeMinute());
-            mCurrentLocationInfo.setLatitudeHour(currentLocationInformation.getLatitudeHour());
-            mCurrentLocationInfo.setLongitudeMin(currentLocationInformation.getLongitudeMinute());
+//            mCurrentLocationInfo.setLongitudeHour(currentLocationInformation.getLongitudeHour());
+//            mCurrentLocationInfo.setLongitudeMin(currentLocationInformation.getLongitudeMinute());
+//            mCurrentLocationInfo.setLatitudeHour(currentLocationInformation.getLatitudeHour());
+//            mCurrentLocationInfo.setLongitudeMin(currentLocationInformation.getLongitudeMinute());
+            mCurrentLocationInfo.setRegionStep1("경기도");
+            mCurrentLocationInfo.setRegionStep2("용인시수지구");
+            mCurrentLocationInfo.setRegionStep3("죽전2동");
 
-            addressString += "fullBody : " + fullBody + ", fullAddressName : " + fullAddressName;
-            mCurrentLocationName = Utils.getFormattedLocationNameFromFullName(mCurrentLocationName);
+            mCurrentLocationName = Utils.getFormattedLocationNameFromFullName(fullAddressName);
+
+            addressString += "fullBody : " + fullBody + ", fullAddressName : " + fullAddressName + ", longh : " + currentLocationInformation.getLongitudeHour()
+            + ", longm : " + currentLocationInformation.getLongitudeMinute()
+            + ", lath : " + currentLocationInformation.getLatitudeHour()
+            + ", latm : " + currentLocationInformation.getLatitudeMinute()
+            + ", formattedString : " + mCurrentLocationName;
+
 
 //        step1 : 도 / 시
 //        step2 : 구 / 군 / 시
@@ -468,11 +474,31 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         Log.d("First App Installed", "My app test current address : " + addressString);
+
+        //TODO 서버 복구 후 아래 한 줄 주석 풀기
         postRequestAddCurrentLocation();
+
+
+
+
+        //TODO 서버 복구후 아래 코드 삭제
+//        mCurrentLocationInfo.setRegionStep1("경기도");
+//        mCurrentLocationInfo.setRegionStep2("성남시분당구");
+//        mCurrentLocationInfo.setRegionStep3("금곡동");
+//        mSQLiteDatabaseManager.addMyRegionDataIntoRegionIncludingCurrentLocationTable(new LocationInfo(mCurrentLocationInfo));
+//        createForecastInformationTable();
+//        SQLiteDatabaseManager.getInstance().updateForecastInformationTable(new ForecastInformation("1", "2.0", "2.0", mUserId, 0));
+//        setIsFinished();
+//        if (PreferenceManager.getBoolean(SplashActivity.this, Constant.IS_INITIATION_FINISHED, false)) {
+//            close();
+//            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+//            startActivity(intent);
+//            finish();
+//        }
+        //TODO 서버 복구 후 위 코드 삭제
     }
 
     public void postRequestAddCurrentLocation() {
-        System.out.println("My app test postRequestAddCurrentLocation function in + id : " + mUserId + ", loc : " + Constant.CURRENT_LOCATION_ID );
         RestAPI restAPI = RestAPIInstance.getInstance().create(RestAPI.class);
         restAPI.AddLocation(mUserId, Constant.CURRENT_LOCATION_ID, mCurrentLocationInfo).enqueue(addCurrentLocationCallbackFunction);
     }
@@ -487,7 +513,7 @@ public class SplashActivity extends AppCompatActivity {
                     mCurrentLocationInfo.setRegionStep1(mCurrentLocationName);
                     mCurrentLocationInfo.setRegionStep2("");
                     mCurrentLocationInfo.setRegionStep3("");
-                    mSQLiteDatabaseManager.addMyRegionData(new LocationInfo(mCurrentLocationInfo));
+                    mSQLiteDatabaseManager.addMyRegionDataIntoRegionIncludingCurrentLocationTable(new LocationInfo(mCurrentLocationInfo));
                     createForecastInformationTable();
                     getCurrentLocalWeather();
                 } else {

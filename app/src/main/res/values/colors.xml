@@ -5,4 +5,6 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorGrey">#DDDDDD</color>
+<!--    <color name="colorRainViewPage">#DDDDDD</color>-->
+<!--    <color name="colorNotRainViewPage">#DDDDDD</color>-->
 </resources>

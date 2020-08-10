@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class FragmentList extends Fragment {
 
     private View inflateView = null;
+    private ListView mListView = null;
     private int regionStep = 0;
     private String regionStepOne = "";
     private String regionStepTwo = "";
@@ -62,15 +63,22 @@ public class FragmentList extends Fragment {
 
         inflateView = inflater.inflate(R.layout.fragment_listview, container, false);
 
-        ListView listView = inflateView.findViewById(R.id.list_view);
+        mListView = inflateView.findViewById(R.id.list_view);
 
-        ArrayList list = SQLiteDatabaseManager.getInstance().getRegionList(regionStep, regionStepOne, regionStepTwo);
+        ArrayList list = SQLiteDatabaseManager.getInstance().getRegionListFromCSVTable(regionStep, regionStepOne, regionStepTwo);
 
         CustomListViewAdapter customAdapter = new CustomListViewAdapter(parentActivity, list);// ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, list);
 
-        listView.setAdapter(customAdapter);
+        inflateView.findViewById(R.id.btn_back_at_select_page).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                parentActivity.onBackPressed();
+            }
+        });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setAdapter(customAdapter);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 FragmentList nextFragmentList = null;
@@ -118,7 +126,9 @@ public class FragmentList extends Fragment {
 //
     private void requestAddLocation (String regionStepOne, String regionStepTwo, String regionStepThree, boolean isGlobalRegion) {
         System.out.println("My app test addlocation here function in");
-        if (PreferenceManager.getInt(parentActivity, Constant.MY_REGION_COUNT) < Constant.MAX_MY_ADD_LOCATION_COUNT) {
+
+        setListViewEnabled(false);
+        if (PreferenceManager.getInt(parentActivity, Constant.MY_ONLY_ADDED_REGION_COUNT) < Constant.MAX_MY_ONLY_ADDED_LOCATION_COUNT) {
             parentActivity.setSelectedLocationInfo(new LocationInfo(regionStepOne, regionStepTwo, regionStepThree, isGlobalRegion));
             parentActivity.postRequestAddLocation();
         } else {
@@ -130,5 +140,7 @@ public class FragmentList extends Fragment {
         return regionStep;
     }
 
-
+    public void setListViewEnabled(boolean isEnable) {
+        mListView.setEnabled(isEnable);
+    }
 }

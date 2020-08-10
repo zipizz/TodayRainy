@@ -50,13 +50,13 @@ public class SQLiteDatabaseManager {
         }
     }
 
-    protected void createRegionDataDB(ArrayList<LocationInfo> regionDataCollections) {
+    protected void createRegionCSVTable(ArrayList<LocationInfo> regionDataCollections) {
 
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
 
-        mRegionDataDatabase.execSQL("DROP TABLE IF EXISTS " + Constant.REGION_DATA_TABLE_NAME);
+        mRegionDataDatabase.execSQL("DROP TABLE IF EXISTS " + Constant.REGION_DATA_FROM_CSV_TABLE_NAME);
 
-        mRegionDataDatabase.execSQL("CREATE TABLE IF NOT EXISTS " + Constant.REGION_DATA_TABLE_NAME + " (" +
+        mRegionDataDatabase.execSQL("CREATE TABLE IF NOT EXISTS " + Constant.REGION_DATA_FROM_CSV_TABLE_NAME + " (" +
                 "regionStep1 varchar(20), " +
                 "regionStep2 varchar(20), " +
                 "regionStep3 varchar(20), " +
@@ -69,11 +69,11 @@ public class SQLiteDatabaseManager {
                 ")"
         );
 
-        mRegionDataDatabase.execSQL("DELETE FROM " + Constant.REGION_DATA_TABLE_NAME);
+        mRegionDataDatabase.execSQL("DELETE FROM " + Constant.REGION_DATA_FROM_CSV_TABLE_NAME);
 
         mRegionDataDatabase.beginTransaction();
         for (LocationInfo regionData : regionDataCollections) {
-            mRegionDataDatabase.execSQL("INSERT INTO " + Constant.REGION_DATA_TABLE_NAME + " (" +
+            mRegionDataDatabase.execSQL("INSERT INTO " + Constant.REGION_DATA_FROM_CSV_TABLE_NAME + " (" +
                     "regionStep1, " +
                     "regionStep2, " +
                     "regionStep3, " +
@@ -101,12 +101,12 @@ public class SQLiteDatabaseManager {
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
 
-    protected void createMyRegionDataDB() {
+    protected void createMyRegionIncludingCurrentLocationTable() {
 
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        mRegionDataDatabase.execSQL("DROP TABLE IF EXISTS " + Constant.REGION_DATA_MY_REGION_TABLE_NAME);
+        mRegionDataDatabase.execSQL("DROP TABLE IF EXISTS " + Constant.REGION_DATA_MY_REGION_INCLUDING_CURRENT_LOCATION_TABLE_NAME);
 
-        mRegionDataDatabase.execSQL("CREATE TABLE IF NOT EXISTS " + Constant.REGION_DATA_MY_REGION_TABLE_NAME + " (" +
+        mRegionDataDatabase.execSQL("CREATE TABLE IF NOT EXISTS " + Constant.REGION_DATA_MY_REGION_INCLUDING_CURRENT_LOCATION_TABLE_NAME + " (" +
                 "regionStep1 varchar(20), " +
                 "regionStep2 varchar(20), " +
                 "regionStep3 varchar(20), " +
@@ -121,16 +121,16 @@ public class SQLiteDatabaseManager {
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
 
-    protected void createLocationIdTable() {
+    protected void createRemainLocationIdTable() {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        mRegionDataDatabase.execSQL("DROP TABLE IF EXISTS " + Constant.REGION_DATA_LOCATION_ID_TABLE_NAME);
+        mRegionDataDatabase.execSQL("DROP TABLE IF EXISTS " + Constant.REGION_DATA_REMAIN_LOCATION_ID_TABLE_NAME);
 
-        mRegionDataDatabase.execSQL("CREATE TABLE IF NOT EXISTS " + Constant.REGION_DATA_LOCATION_ID_TABLE_NAME + " (" +
+        mRegionDataDatabase.execSQL("CREATE TABLE IF NOT EXISTS " + Constant.REGION_DATA_REMAIN_LOCATION_ID_TABLE_NAME + " (" +
                 "locationId INTEGER PRIMARY KEY" +
                 ")"
         );
-        for (int i = 1; i <= Constant.MAX_MY_ADD_LOCATION_COUNT; i++) {
-            addLocationId(i);
+        for (int i = 1; i <= Constant.MAX_MY_ONLY_ADDED_LOCATION_COUNT; i++) {
+            addLocationIdIntoRemainLocationIdTable(i);
         }
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
@@ -144,7 +144,7 @@ public class SQLiteDatabaseManager {
                 "uid varchar(20), " +
                 "locationId INTEGER, " +
                 "FOREIGN KEY ( locationId ) " +
-                "REFERENCES " + Constant.REGION_DATA_LOCATION_ID_TABLE_NAME +
+                "REFERENCES " + Constant.REGION_DATA_REMAIN_LOCATION_ID_TABLE_NAME +
                 " ( locationId ) " +
                 ")"
         );
@@ -154,7 +154,7 @@ public class SQLiteDatabaseManager {
 
     private void addEmptyForecastInformationList() {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        for (int i = 0; i < Constant.MAX_LOCATION_COUNT; i++) {
+        for (int i = 0; i < Constant.MAX_LOCATION_INCLUDING_CURRENT_LOCATION_COUNT; i++) {
             int locationId = i;
             if (i == 0) {
                 locationId = Constant.CURRENT_LOCATION_ID;
@@ -253,7 +253,7 @@ public class SQLiteDatabaseManager {
         return forecastInformationList;
     }
 
-    protected ForecastInformation getForcastInformation(int locationId) {
+    protected ForecastInformation getForecastInformation(int locationId) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
         Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.FORECAST_INFORMATION_TABLE_NAME
                 + " WHERE locationId = " + locationId, null);
@@ -273,9 +273,9 @@ public class SQLiteDatabaseManager {
         return forecastInformation;
     }
 
-    protected void addLocationId(int locationId) {
+    protected void addLocationIdIntoRemainLocationIdTable(int locationId) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        mRegionDataDatabase.execSQL("INSERT INTO " + Constant.REGION_DATA_LOCATION_ID_TABLE_NAME + " (" +
+        mRegionDataDatabase.execSQL("INSERT INTO " + Constant.REGION_DATA_REMAIN_LOCATION_ID_TABLE_NAME + " (" +
                 "locationId" +
                 ") VALUES (" +
                 locationId +
@@ -284,9 +284,9 @@ public class SQLiteDatabaseManager {
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
 
-    public boolean hasLocation(LocationInfo locationInfo) {
+    public boolean hasLocationInMyRegionDataIncludingCurrentLocationTable(LocationInfo locationInfo) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT COUNT(*) FROM " + Constant.REGION_DATA_MY_REGION_TABLE_NAME
+        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT COUNT(*) FROM " + Constant.REGION_DATA_MY_REGION_INCLUDING_CURRENT_LOCATION_TABLE_NAME
                 + " WHERE regionStep1 = " + "\"" + locationInfo.getRegionStep1() + "\""
                         + " AND regionStep2 = " + "\"" + locationInfo.getRegionStep2() + "\""
                         + " AND regionStep3 = " + "\"" + locationInfo.getRegionStep3() + "\"",
@@ -303,9 +303,9 @@ public class SQLiteDatabaseManager {
         return hasLocation;
     }
 
-    public void deleteLocationId(int locationId) {
+    public void deleteLocationIdFromRemainLocationIdTable(int locationId) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        mRegionDataDatabase.execSQL("DELETE FROM " + Constant.REGION_DATA_LOCATION_ID_TABLE_NAME +
+        mRegionDataDatabase.execSQL("DELETE FROM " + Constant.REGION_DATA_REMAIN_LOCATION_ID_TABLE_NAME +
                 " WHERE " +
                 "locationId = " +
                 locationId
@@ -313,9 +313,9 @@ public class SQLiteDatabaseManager {
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
 
-    public int getLocationIdMin() {
+    public int getRemainLocationIdMin() {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_LOCATION_ID_TABLE_NAME + " ORDER BY locationId", null);
+        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_REMAIN_LOCATION_ID_TABLE_NAME + " ORDER BY locationId", null);
 
         int locationIdMinValue = Constant.LOCATION_ID_NOT_EXIST;
 
@@ -327,9 +327,9 @@ public class SQLiteDatabaseManager {
         return locationIdMinValue;
     }
 
-    public ArrayList<Integer> getLocationIdList() {
+    public ArrayList<Integer> getRemainLocationIdList() {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_LOCATION_ID_TABLE_NAME + " ORDER BY locationId", null);
+        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_REMAIN_LOCATION_ID_TABLE_NAME + " ORDER BY locationId", null);
 
         ArrayList locationIdList = new ArrayList<>();
 
@@ -344,9 +344,9 @@ public class SQLiteDatabaseManager {
         return locationIdList;
     }
 
-    public void showRegionDataDB() {
+    public void showRegionDataListFromCSVTable() {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_TABLE_NAME, null);
+        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_FROM_CSV_TABLE_NAME, null);
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
@@ -367,9 +367,9 @@ public class SQLiteDatabaseManager {
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
 
-    public ArrayList<LocationInfo> getMyRegionDataList() {
+    public ArrayList<LocationInfo> getMyRegionDataListFromCSVTable() {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_TABLE_NAME, null);
+        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_FROM_CSV_TABLE_NAME, null);
         ArrayList<LocationInfo> myRegionDataList = new ArrayList<LocationInfo>();
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -388,9 +388,9 @@ public class SQLiteDatabaseManager {
         return myRegionDataList;
     }
 
-    public LocationInfo getMyRegionData(int locationId) {
+    public LocationInfo getMyRegionDataFromRegionIncludingCurrentLocationTable(int locationId) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_MY_REGION_TABLE_NAME +
+        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_MY_REGION_INCLUDING_CURRENT_LOCATION_TABLE_NAME +
                 " WHERE locationId = " + locationId, null);
 
         LocationInfo locationInfo = null;
@@ -409,9 +409,9 @@ public class SQLiteDatabaseManager {
         return locationInfo;
     }
 
-    public ArrayList<LocationInfo> getMyAddedRegionDataList(boolean isOrderByLocationId) {
+    public ArrayList<LocationInfo> getMyRegionIncludingCurrentLocationList(boolean isOrderByLocationId) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_MY_REGION_TABLE_NAME +
+        Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_MY_REGION_INCLUDING_CURRENT_LOCATION_TABLE_NAME +
                 (isOrderByLocationId ? " ORDER BY locationId" : ""), null);
         ArrayList<LocationInfo> myRegionDataList = new ArrayList<LocationInfo>();
 
@@ -431,20 +431,20 @@ public class SQLiteDatabaseManager {
         return myRegionDataList;
     }
 
-    public ArrayList<LocationInfo> getRegionList(int regionStep, String regionStepOneName, String regionStepTwoName) {
+    public ArrayList<LocationInfo> getRegionListFromCSVTable(int regionStep, String regionStepOneName, String regionStepTwoName) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
 
         String SQL = "";
 
         switch (regionStep) {
             case 1 :
-                SQL = "SELECT DISTINCT(regionStep1) FROM " + Constant.REGION_DATA_TABLE_NAME;
+                SQL = "SELECT DISTINCT(regionStep1) FROM " + Constant.REGION_DATA_FROM_CSV_TABLE_NAME;
                 break;
             case 2 :
-                SQL = "SELECT DISTINCT(regionStep2) FROM " + Constant.REGION_DATA_TABLE_NAME + " WHERE regionStep1 = '" + regionStepOneName + "'";
+                SQL = "SELECT DISTINCT(regionStep2) FROM " + Constant.REGION_DATA_FROM_CSV_TABLE_NAME + " WHERE regionStep1 = '" + regionStepOneName + "'";
                 break;
             case 3 :
-                SQL = "SELECT DISTINCT(regionStep3) FROM " + Constant.REGION_DATA_TABLE_NAME + " WHERE regionStep1 = '" + regionStepOneName + "' AND regionStep2 = '" + regionStepTwoName + "'";
+                SQL = "SELECT DISTINCT(regionStep3) FROM " + Constant.REGION_DATA_FROM_CSV_TABLE_NAME + " WHERE regionStep1 = '" + regionStepOneName + "' AND regionStep2 = '" + regionStepTwoName + "'";
                 break;
             default :
                 break;
@@ -502,9 +502,9 @@ public class SQLiteDatabaseManager {
         return mRegionDataDatabase;
     }
 
-    public void addMyRegionData(LocationInfo locationInfo) {
+    public void addMyRegionDataIntoRegionIncludingCurrentLocationTable(LocationInfo locationInfo) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        mRegionDataDatabase.execSQL("INSERT INTO " + Constant.REGION_DATA_MY_REGION_TABLE_NAME + " (" +
+        mRegionDataDatabase.execSQL("INSERT INTO " + Constant.REGION_DATA_MY_REGION_INCLUDING_CURRENT_LOCATION_TABLE_NAME + " (" +
                 "regionStep1, " +
                 "regionStep2, " +
                 "regionStep3, " +
@@ -529,9 +529,9 @@ public class SQLiteDatabaseManager {
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
 
-    public void deleteMyRegionData(int locationId) {
+    public void deleteMyRegionDataFromRegionIncludingCurrentLocationTable(int locationId) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        mRegionDataDatabase.execSQL("DELETE FROM " + Constant.REGION_DATA_MY_REGION_TABLE_NAME +
+        mRegionDataDatabase.execSQL("DELETE FROM " + Constant.REGION_DATA_MY_REGION_INCLUDING_CURRENT_LOCATION_TABLE_NAME +
                 " WHERE locationId = " + locationId
         );
         SQLiteDatabaseManager.getInstance().closeDatabase();

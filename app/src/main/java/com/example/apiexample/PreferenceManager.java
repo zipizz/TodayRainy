@@ -97,11 +97,11 @@ public class PreferenceManager {
     }
 
     public static void incrementMyRegionCount(Context context) {
-        setInt(context, Constant.MY_REGION_COUNT, getInt(context, Constant.MY_REGION_COUNT) + 1);
+        setInt(context, Constant.MY_ONLY_ADDED_REGION_COUNT, getInt(context, Constant.MY_ONLY_ADDED_REGION_COUNT) + 1);
     }
 
     public static void decrementMyRegionCount(Context context) {
-        setInt(context, Constant.MY_REGION_COUNT, getInt(context, Constant.MY_REGION_COUNT) - 1);
+        setInt(context, Constant.MY_ONLY_ADDED_REGION_COUNT, getInt(context, Constant.MY_ONLY_ADDED_REGION_COUNT) - 1);
     }
 
     public static void incrementGrantedPermissionCount(Context context) {
