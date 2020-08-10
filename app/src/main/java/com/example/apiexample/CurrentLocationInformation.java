@@ -6,7 +6,9 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 
 import androidx.core.app.ActivityCompat;
 
@@ -16,7 +18,7 @@ import java.util.List;
 public class GPSInformation {
 
     private Context mContext;
-    private Location GPSLocation = null;
+    private Location mLocation = null;
     private double mLatitude, mLongititude, mLatitudeSecond, mLongitudeSecond;
     private int mLatitudeHour, mLatitudeMinute, mLongitudeHour, mLongitudeMinute;
     private Address GPSAddress = null;
@@ -24,9 +26,7 @@ public class GPSInformation {
     public GPSInformation(Context context) {
         mContext = context;
 
-        Geocoder g = new Geocoder(mContext);
-
-        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -37,9 +37,10 @@ public class GPSInformation {
             return;
         }
 
-        GPSLocation = ((LocationManager) mContext.getSystemService(mContext.LOCATION_SERVICE)).getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        mLatitude = GPSLocation.getLatitude();
-        mLongititude = GPSLocation.getLongitude();
+        mLocation = ((LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE)).getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+        mLatitude = mLocation.getLatitude();
+        mLongititude = mLocation.getLongitude();
 
         mLatitudeHour = (int) mLatitude;
         mLatitudeMinute = (int) ((mLatitude - mLatitudeHour) * 60);
@@ -49,8 +50,10 @@ public class GPSInformation {
         mLongitudeMinute = (int) ((mLongititude - mLongitudeHour) * 60);
         mLongitudeSecond = ((mLongititude - mLongitudeHour) * 60 - mLongitudeMinute) * 60;
 
+        Geocoder g = new Geocoder(mContext);
+
         try {
-            GPSAddress = g.getFromLocation(GPSLocation.getLatitude(), GPSLocation.getLongitude(), 1).get(0);
+            GPSAddress = g.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1).get(0);
         } catch (IOException e) {
             e.printStackTrace();
         }
