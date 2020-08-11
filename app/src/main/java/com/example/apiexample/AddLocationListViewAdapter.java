@@ -60,18 +60,16 @@ public class AddLocationListViewAdapter extends ArrayAdapter {
         LocationInfo locationInfo = (LocationInfo) getItem(viewHolder.position);
         int locationId = locationInfo.getLocationId();
 
-
-
         if (viewHolder.position == 0) {
             viewHolder.regionNameView.setText("GPS 현재 위치");
         } else {
+            viewHolder.regionNameView.setText(locationInfo.toString());
+
             if(parentActivity.isEditButtonClickedAtLeastOnce()) {
                 ConstraintLayout.LayoutParams cl2 = (ConstraintLayout.LayoutParams) viewHolder.rainyStateLayout.getLayoutParams();
                 cl2.rightMargin = (int) Utils.convertDpToPixel(Constant.EDIT_MODE_RAINY_STATE_MARGIN_RIGHT_AFTER_MOVE_DP + Constant.EDIT_MODE_RAINY_STATE_LAYOUT_TRANSITION_DISTANCE_DP, parentActivity);
                 viewHolder.rainyStateLayout.setLayoutParams(cl2);
 
-                System.out.println("my app test position : " + viewHolder.position);
-                viewHolder.regionNameView.setText(locationInfo.toString());
                 TranslateAnimation anim = new TranslateAnimation
                         (Utils.convertDpToPixel(Constant.EDIT_MODE_TEXT_TRANSITION_DISTANCE_DP, parentActivity),   // fromXDelta
                                 0,  // toXDelta

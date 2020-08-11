@@ -2,7 +2,6 @@ package com.example.apiexample;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
@@ -87,12 +86,7 @@ public class AddLocationActivity extends AppCompatActivity {
                     mAddLocationButton.setVisibility(View.INVISIBLE);
                     mIsEditMode = true;
                 } else {
-                    mEditOrderButton.setText("편집");
-                    mEditOrderButton.setTag(R.drawable.ic_edit_24px);
-                    mListView.setAdapter(mAddLocationListViewAdapter);
-                    mAddLocationButton.setVisibility(View.VISIBLE);
-                    mEditLocationOrderListViewAdapter.doAfterEditFinished();
-                    mIsEditMode = false;
+                    doAfterEditFinished();
                 }
             }
         });
@@ -131,6 +125,21 @@ public class AddLocationActivity extends AppCompatActivity {
                 deleteLocation();
             }
         });
+    }
+
+    private void doAfterEditFinished() {
+        mEditLocationOrderListViewAdapter.doAfterEditFinishedAtAdapter();
+        doAfterEditFinishedAtAddLocationActivity();
+    }
+
+    public void doAfterEditFinishedAtAddLocationActivity() {
+        slideClear();
+        clearDeletedLocationIdList();
+        mEditOrderButton.setText("편집");
+        mEditOrderButton.setTag(R.drawable.ic_edit_24px);
+        mListView.setAdapter(mAddLocationListViewAdapter);
+        mAddLocationButton.setVisibility(View.VISIBLE);
+        mIsEditMode = false;
     }
 
     protected boolean isEditButtonClickedAtLeastOnce () {
@@ -186,12 +195,7 @@ public class AddLocationActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if(mIsEditMode) {
-            mEditOrderButton.setText("편집");
-            mEditOrderButton.setTag(R.drawable.ic_edit_24px);
-            mListView.setAdapter(mAddLocationListViewAdapter);
-            mAddLocationButton.setVisibility(View.VISIBLE);
-            mEditLocationOrderListViewAdapter.doAfterEditFinished();
-            mIsEditMode = false;
+            doAfterEditFinished();
         } else {
             super.onBackPressed();
         }
@@ -207,19 +211,16 @@ public class AddLocationActivity extends AppCompatActivity {
 
         if (mSelectedDeleteLocationId.size() == 0) {
             mCustomArrayList = SQLiteDatabaseManager.getInstance().getMyRegionIncludingCurrentLocationList(false);
-            mAddLocationListViewAdapter.clear();
-            mAddLocationListViewAdapter.addAll(mCustomArrayList);
+            mAddLocationListViewAdapter = new AddLocationListViewAdapter(this, mCustomArrayList, this);
+//            mAddLocationListViewAdapter.clear();
+//            mAddLocationListViewAdapter.addAll(mCustomArrayList);
             mAddLocationListViewAdapter.notifyDataSetChanged();
-            mEditLocationOrderListViewAdapter.clear();
-            mEditLocationOrderListViewAdapter.addAll(mCustomArrayList);
+            mEditLocationOrderListViewAdapter = new EditLocationOrderListViewAdapter(this, mCustomArrayList, this);
+//            mEditLocationOrderListViewAdapter.clear();
+//            mEditLocationOrderListViewAdapter.addAll(mCustomArrayList);
             mEditLocationOrderListViewAdapter.notifyDataSetChanged();
 
-            mEditOrderButton.setText("편집");
-            mEditOrderButton.setTag(R.drawable.ic_edit_24px);
-            mListView.setAdapter(mAddLocationListViewAdapter);
-            mAddLocationButton.setVisibility(View.VISIBLE);
-
-            mEditLocationOrderListViewAdapter.doAfterEditFinished();
+            doAfterEditFinished();
             Intent intent = new Intent();
             intent.putExtra("locationChanged", true);
             setResult(Constant.CHANGE_LOCATION_REQUEST_SUCCESS_CODE, intent);
@@ -292,15 +293,31 @@ public class AddLocationActivity extends AppCompatActivity {
         if (requestCode == Constant.ADD_LOCATION_REQUEST_CODE) {
             if (resultCode == Constant.ADD_LOCATION_RESULT_SUCCESS_CODE) {
                 if(!data.getExtras().getBoolean("hasAddedRegion")) {
+                    System.out.println("my app test : hasAddedRegion not");
                     return;
                 };
+                System.out.println("my app test : hasAddedRegion yes!");
+
                 mCustomArrayList = SQLiteDatabaseManager.getInstance().getMyRegionIncludingCurrentLocationList(false);
-                mAddLocationListViewAdapter.clear();
-                mAddLocationListViewAdapter.addAll(mCustomArrayList);
-                mAddLocationListViewAdapter.notifyDataSetChanged();
-                mEditLocationOrderListViewAdapter.clear();
-                mEditLocationOrderListViewAdapter.addAll(mCustomArrayList);
-                mEditLocationOrderListViewAdapter.notifyDataSetChanged();
+
+                System.out.println("my app test : array start size : " + mCustomArrayList.size());
+                for (int i = 0; i < mCustomArrayList.size(); i++) {
+                    System.out.println("my app test [" + i + "] : " + mCustomArrayList.get(i).toString());
+                }
+                mAddLocationListViewAdapter = new AddLocationListViewAdapter(this, mCustomArrayList, this);
+                mEditLocationOrderListViewAdapter = new EditLocationOrderListViewAdapter(this, mCustomArrayList, this);
+
+//                mAddLocationListViewAdapter.clear();
+//                mAddLocationListViewAdapter.addAll(mCustomArrayList);
+                mListView.setAdapter(mAddLocationListViewAdapter);
+
+//                mAddLocationListViewAdapter.notifyDataSetChanged();
+
+
+//                mEditLocationOrderListViewAdapter.clear();
+//                mEditLocationOrderListViewAdapter.addAll(mCustomArrayList);
+//                mEditLocationOrderListViewAdapter.notifyDataSetChanged();
+
                 Intent intent = new Intent();
                 intent.putExtra("locationChanged", true);
                 setResult(Constant.CHANGE_LOCATION_REQUEST_SUCCESS_CODE, intent);

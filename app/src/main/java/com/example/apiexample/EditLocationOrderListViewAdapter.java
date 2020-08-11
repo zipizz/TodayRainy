@@ -149,16 +149,10 @@ public class EditLocationOrderListViewAdapter extends ArrayAdapter {
 //        ((View)getItem(position)).findViewById(R.id.item_edit_layout).setBackgroundColor(mContext.getResources().getColor(R.color.colorWhite));
     }
 
-    protected void doAfterEditFinished() {
+    protected void doAfterEditFinishedAtAdapter() {
         System.out.println("my app test editfinished");
-        parentActivity.slideClear();
-        parentActivity.clearDeletedLocationIdList();
         isDeleteLayoutVisible = false;
         mTouchCount = 0;
-    }
-
-    public void slideRightLocationText() {
-
     }
 
 //    private void doAfterDelete() {

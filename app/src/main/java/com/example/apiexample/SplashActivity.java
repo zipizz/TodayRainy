@@ -433,10 +433,10 @@ public class SplashActivity extends AppCompatActivity {
             mCurrentLocationInfo.setLongitudeMin(Constant.NOT_EXIST_REGION_COORDINATE);
             mCurrentLocationInfo.setLatitudeHour(Constant.NOT_EXIST_REGION_COORDINATE);
             mCurrentLocationInfo.setLongitudeMin(Constant.NOT_EXIST_REGION_COORDINATE);
-            mCurrentLocationName = "대한민국";
-//            mCurrentLocationInfo.setRegionStep1("경기도");
-//            mCurrentLocationInfo.setRegionStep2("성남시분당구");
-//            mCurrentLocationInfo.setRegionStep3("금곡동");
+            mCurrentLocationInfo.setRegionStep1("서울특별시");
+            mCurrentLocationInfo.setRegionStep2("");
+            mCurrentLocationInfo.setRegionStep3("");
+            mCurrentLocationName = "서울특별시";
         } else {
             Address currentAddress = currentLocationInformation.getGPSAddress();
             String fullBody = "";
@@ -448,13 +448,13 @@ public class SplashActivity extends AppCompatActivity {
                 fullBody = currentAddress.toString();
                 fullAddressName = currentAddress.getAddressLine(0);
             }
-//            mCurrentLocationInfo.setLongitudeHour(currentLocationInformation.getLongitudeHour());
-//            mCurrentLocationInfo.setLongitudeMin(currentLocationInformation.getLongitudeMinute());
-//            mCurrentLocationInfo.setLatitudeHour(currentLocationInformation.getLatitudeHour());
-//            mCurrentLocationInfo.setLongitudeMin(currentLocationInformation.getLongitudeMinute());
-            mCurrentLocationInfo.setRegionStep1("경기도");
-            mCurrentLocationInfo.setRegionStep2("용인시수지구");
-            mCurrentLocationInfo.setRegionStep3("죽전2동");
+            mCurrentLocationInfo.setLongitudeHour(currentLocationInformation.getLongitudeHour());
+            mCurrentLocationInfo.setLongitudeMin(currentLocationInformation.getLongitudeMinute());
+            mCurrentLocationInfo.setLatitudeHour(currentLocationInformation.getLatitudeHour());
+            mCurrentLocationInfo.setLatitudeMin(currentLocationInformation.getLatitudeMinute());
+//            mCurrentLocationInfo.setRegionStep1("경기도");
+//            mCurrentLocationInfo.setRegionStep2("용인시수지구");
+//            mCurrentLocationInfo.setRegionStep3("죽전2동");
 
             mCurrentLocationName = Utils.getFormattedLocationNameFromFullName(fullAddressName);
 
