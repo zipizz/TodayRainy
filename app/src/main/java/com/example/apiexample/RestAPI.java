@@ -1,14 +1,11 @@
 package com.example.apiexample;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
-import retrofit2.http.FieldMap;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -28,14 +25,14 @@ public interface RestAPI {
 //    Call<List<LinkedHashMap>> getLocalWeather(@Path("id") int id);
 
     @POST("BOnyaSvr" + URLConstant.CREATE_USER)
-    Call<Integer> CreateUser(@Path("uid") String userIdentifier);
+    Call<Integer> createUser(@Path("uid") String userIdentifier);
 
 //    @Headers({ "Content-Type: application/json;charset=UTF-8"})
 //    @POST("SpringRestExample/rest/local-weather/create")
 //    Call<Integer> CreateWeatherID(@Body WeatherLocation createBody);
 
-    @POST("BOnyaSvr" + URLConstant.ADD_LOCATION)
-    Call<Integer> AddLocation(@Path("uid") String userIdentifier, @Path("locationid") int locationId, @Body LocationInfoForServer locationInfo);
+    @POST("BOnyaSvr" + URLConstant.REGISTER_LOCATION)
+    Call<Integer> registerLocation(@Path("uid") String userIdentifier, @Path("locationid") int locationId, @Body LocationInfoForServer locationInfo);
 
     @GET("BOnyaSvr" + URLConstant.GET_LOCATION)
     Call<LinkedHashMap> getLocation(@Path("uid") String userIdentifier, @Path("locationid") int locationId);

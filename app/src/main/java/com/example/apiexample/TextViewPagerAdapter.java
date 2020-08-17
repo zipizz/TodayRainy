@@ -1,15 +1,21 @@
 package com.example.apiexample;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.viewpager.widget.PagerAdapter;
 
 import java.text.SimpleDateFormat;
@@ -32,6 +38,7 @@ public class TextViewPagerAdapter extends PagerAdapter {
     private View mView = null;
     private int mLocationCount = 0;
     private ArrayList<LocationInfo> mMyLocationInfoList = new ArrayList<LocationInfo>();
+    private boolean hasLocationAtLeastOne;
 
     public TextViewPagerAdapter () {
     }
@@ -39,14 +46,24 @@ public class TextViewPagerAdapter extends PagerAdapter {
     public TextViewPagerAdapter(Context context, MainActivity parentActivity) {
         this.mContext = context;
         this.parentActivity = parentActivity;
-        this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_ONLY_ADDED_REGION_COUNT) + 1;
+        this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_REGISTERED_LOCATION_COUNT_INCLUDING_CURRENT_LOCATION);
         this.mMyLocationInfoList = SQLiteDatabaseManager.getInstance().getMyRegionIncludingCurrentLocationList(false);
         this.mRetrofit = RestAPIInstance.getInstance();
+        if (mLocationCount > 0) {
+            hasLocationAtLeastOne = true;
+        } else {
+            hasLocationAtLeastOne = false;
+            mMyLocationInfoList.add(new LocationInfo("등록된 지역이 없습니다."));
+        }
     }
 
     @Override
     public int getCount() {
-        return this.mLocationCount;
+        if (hasLocationAtLeastOne) {
+            return this.mLocationCount;
+        } else {
+            return 1;
+        }
     }
 
     @Override
@@ -56,7 +73,7 @@ public class TextViewPagerAdapter extends PagerAdapter {
 
     protected void setDataChanged() {
         this.mMyLocationInfoList = SQLiteDatabaseManager.getInstance().getMyRegionIncludingCurrentLocationList(false);
-        this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_ONLY_ADDED_REGION_COUNT) + 1;
+        this.mLocationCount = PreferenceManager.getInt(parentActivity, Constant.MY_REGISTERED_LOCATION_COUNT_INCLUDING_CURRENT_LOCATION);
         this.notifyDataSetChanged();
     }
 
@@ -82,56 +99,74 @@ public class TextViewPagerAdapter extends PagerAdapter {
             });
 
             LocationInfo locationInfo = mMyLocationInfoList.get(position);
-            if (position == 0) {
+            ForecastInformationTown forecastInformationTown = SQLiteDatabaseManager.getInstance().getForecastInformation(locationInfo.getLocationId());
+            if (position == 0 && hasLocationAtLeastOne) {
                 mView.findViewById(R.id.isCurrentLocation).setVisibility(View.VISIBLE);
             } else {
                 mView.findViewById(R.id.isCurrentLocation).setVisibility(View.INVISIBLE);
             }
 
             SimpleDateFormat dayTime = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            String str = dayTime.format(new Date(System.currentTimeMillis()));
 
-            ((TextView) mView.findViewById(R.id.currentLocation)).setText(locationInfo.toString());
-            ((TextView)mView.findViewById(R.id.updateTime)).setText(str);
-
-            ForecastInformation forecastInformation = SQLiteDatabaseManager.getInstance().getForecastInformation(locationInfo.getLocationId());
-
-            if (forecastInformation.isRainy()) {
-                ((TextView)mView.findViewById(R.id.rain_text)).setText("비 온다");
-                ((AppCompatImageView)mView.findViewById(R.id.imageCenter)).setImageResource(R.drawable.ic_umbrella);
+            if (hasLocationAtLeastOne) {
+                ((TextView) mView.findViewById(R.id.currentLocation)).setText(locationInfo.toString());
+                ((TextView) mView.findViewById(R.id.updateTime)).setText(forecastInformationTown.getFormattedUpdatedDate());
             } else {
-                ((TextView)mView.findViewById(R.id.rain_text)).setText("비 안 온다");
-                ((AppCompatImageView)mView.findViewById(R.id.imageCenter)).setImageResource(R.drawable.ic_sun);
+                ((TextView) mView.findViewById(R.id.currentLocation)).setVisibility(View.INVISIBLE);
+                ((TextView) mView.findViewById(R.id.updateTime)).setVisibility(View.INVISIBLE);
             }
 
-            ((AppCompatImageView)mView.findViewById(R.id.imageCenter)).setOnClickListener(new OnCustomClickListener() {
-                @Override
-                public void onSingleClick(View v) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ArrayList drawableList = new ArrayList();
-                            drawableList.add(R.drawable.ic_icon_emoji_1);
-                            drawableList.add(R.drawable.ic_icon_emoji_2);
-                            drawableList.add(R.drawable.ic_icon_emoji_3);
-                            drawableList.add(R.drawable.ic_icon_emoji_4);
-                            int randomDrawableId = (int) drawableList.get(new Random().nextInt(drawableList.size()));
-                            ((AppCompatImageView)v).setImageResource(randomDrawableId);
-
-                            try {
-                                Thread.sleep(200);
-                                if (forecastInformation.isRainy()) {
-                                    ((AppCompatImageView)v).setImageResource(R.drawable.ic_umbrella);
-                                } else {
-                                    ((AppCompatImageView)v).setImageResource(R.drawable.ic_sun);
-                                }
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
+            if (hasLocationAtLeastOne) {
+                if (forecastInformationTown.isRainy()) {
+                    ((TextView) mView.findViewById(R.id.rain_text)).setText("비 온다");
+                    ((AppCompatImageView) mView.findViewById(R.id.imageCenter)).setImageResource(R.drawable.ic_umbrella);
+                } else {
+                    ((TextView) mView.findViewById(R.id.rain_text)).setText("비 안 온다");
+                    ((AppCompatImageView) mView.findViewById(R.id.imageCenter)).setImageResource(R.drawable.ic_sun);
                 }
-            });
+            } else {
+                ((TextView) mView.findViewById(R.id.rain_text)).setText("지역 추가");
+                ((AppCompatImageView) mView.findViewById(R.id.imageCenter)).setImageResource(R.drawable.ic_add_circle_outline);
+            }
+
+            if (hasLocationAtLeastOne) {
+                ((AppCompatImageView) mView.findViewById(R.id.imageCenter)).setOnClickListener(new OnCustomClickListener() {
+                    @Override
+                    public void onSingleClick(View v) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ArrayList drawableList = new ArrayList();
+                                drawableList.add(R.drawable.ic_icon_emoji_1);
+                                drawableList.add(R.drawable.ic_icon_emoji_2);
+                                drawableList.add(R.drawable.ic_icon_emoji_3);
+                                drawableList.add(R.drawable.ic_icon_emoji_4);
+                                int randomDrawableId = (int) drawableList.get(new Random().nextInt(drawableList.size()));
+                                ((AppCompatImageView) v).setImageResource(randomDrawableId);
+
+                                try {
+                                    Thread.sleep(200);
+                                    if (forecastInformationTown.isRainy()) {
+                                        ((AppCompatImageView) v).setImageResource(R.drawable.ic_umbrella);
+                                    } else {
+                                        ((AppCompatImageView) v).setImageResource(R.drawable.ic_sun);
+                                    }
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
+                });
+            } else {
+                ((AppCompatImageView) mView.findViewById(R.id.imageCenter)).setOnClickListener(new OnCustomClickListener() {
+                    @Override
+                    public void onSingleClick(View v) {
+                        Intent intent = new Intent(mContext, AddLocationActivity.class);
+                        parentActivity.startActivityForResult(intent, Constant.CHANGE_LOCATION_REQUEST_CODE);
+                    }
+                });
+            }
         }
 
 //        for (int i = 1; i <= 5; i++) {

@@ -71,7 +71,7 @@ public class SelectLocationActivity extends AppCompatActivity {
         a.setRegionStep3(mSelectedLocationInfo.getRegionStep3());
 
         RestAPI restAPI = RestAPIInstance.getInstance().create(RestAPI.class);
-        restAPI.AddLocation(mUserId, mSelectedLocationId, a).enqueue(addLocationCallbackFunction);
+        restAPI.registerLocation(mUserId, mSelectedLocationId, a).enqueue(addLocationCallbackFunction);
     }
 
     public void replaceFragment(Fragment fragment) {
@@ -89,9 +89,9 @@ public class SelectLocationActivity extends AppCompatActivity {
                 if(responseCode == 0) {
                     System.out.println("My app test add location : response code success");
                     mSelectedLocationInfo.setLocationId(mSelectedLocationId);
-                    mSQLiteDatabaseManager.addMyRegionDataIntoRegionIncludingCurrentLocationTable(mSelectedLocationInfo);
+                    mSQLiteDatabaseManager.addMyLocationDataIntoLocationIncludingCurrentLocationTable(mSelectedLocationInfo);
                     mSQLiteDatabaseManager.deleteLocationIdFromRemainLocationIdTable(mSelectedLocationId);
-                    PreferenceManager.incrementMyRegionCount(SelectLocationActivity.this);
+                    PreferenceManager.incrementMyLocationCount(SelectLocationActivity.this);
                     Intent intent = new Intent();
                     intent.putExtra("hasAddedRegion", true);
                     setResult(Constant.ADD_LOCATION_RESULT_SUCCESS_CODE, intent);

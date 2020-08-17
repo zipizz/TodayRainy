@@ -128,7 +128,7 @@ public class FragmentList extends Fragment {
         System.out.println("My app test addlocation here function in");
 
         setListViewEnabled(false);
-        if (PreferenceManager.getInt(parentActivity, Constant.MY_ONLY_ADDED_REGION_COUNT) < Constant.MAX_MY_ONLY_ADDED_LOCATION_COUNT) {
+        if (PreferenceManager.getInt(parentActivity, Constant.MY_REGISTERED_LOCATION_COUNT_INCLUDING_CURRENT_LOCATION) < Constant.MAX_LOCATION_INCLUDING_CURRENT_LOCATION_COUNT) {
             parentActivity.setSelectedLocationInfo(new LocationInfo(regionStepOne, regionStepTwo, regionStepThree, isGlobalRegion));
             parentActivity.postRequestAddLocation();
         } else {

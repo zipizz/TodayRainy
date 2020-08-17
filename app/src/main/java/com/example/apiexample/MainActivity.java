@@ -1,30 +1,20 @@
 package com.example.apiexample;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,9 +30,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initiateVariable();
         initiateView();
+        startGetForecastInformationService();
         Log.d("First App Installed", "My app test 8: end Initiation");
-//        closeAll();
-
     }
 
     private void initiateVariable() {
@@ -54,6 +43,16 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         pagerAdapter = new TextViewPagerAdapter(this, this);
         viewPager.setAdapter(pagerAdapter);
+    }
+
+    private void startGetForecastInformationService() {
+        Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
+        PeriodicWorkRequest workRequest =
+                new PeriodicWorkRequest.Builder(GetForecastInformationWorker.class, Constant.GET_FORECAST_INFORMATION_PERIOD_MINUTE, TimeUnit.MINUTES)
+                        .setConstraints(constraints)
+                        .build();
+        WorkManager workManager = WorkManager.getInstance();
+        workManager.enqueueUniquePeriodicWork(Constant.GET_FORECAST_INFORMATION_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest);
     }
 
 //    protected void deleteUser() {

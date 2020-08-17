@@ -6,24 +6,21 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 
 import androidx.core.app.ActivityCompat;
 
 import java.io.IOException;
-import java.util.List;
 
-public class CurrentLocationInformation {
+public class NetworkLocationInformation {
 
     private Context mContext;
     private Location mLocation = null;
     private double mLatitude, mLongititude, mLatitudeSecond, mLongitudeSecond;
     private int mLatitudeHour, mLatitudeMinute, mLongitudeHour, mLongitudeMinute;
-    private Address GPSAddress = null;
+    private Address mNetworkAddress = null;
 
-    public CurrentLocationInformation(Context context) {
+    public NetworkLocationInformation(Context context) {
         mContext = context;
 
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -53,7 +50,7 @@ public class CurrentLocationInformation {
         Geocoder g = new Geocoder(mContext);
 
         try {
-            GPSAddress = g.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1).get(0);
+            mNetworkAddress = g.getFromLocation(mLocation.getLatitude(), mLocation.getLongitude(), 1).get(0);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,7 +72,7 @@ public class CurrentLocationInformation {
         return mLongitudeMinute;
     }
 
-    public Address getGPSAddress() {
-        return GPSAddress;
+    public Address getNetworkAddress() {
+        return mNetworkAddress;
     }
 }

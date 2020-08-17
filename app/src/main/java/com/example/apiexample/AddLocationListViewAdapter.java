@@ -90,9 +90,9 @@ public class AddLocationListViewAdapter extends ArrayAdapter {
             }
         }
 
-        ForecastInformation forecastInformation = SQLiteDatabaseManager.getInstance().getForecastInformation(locationId);
-        if (forecastInformation != null) {
-            if (forecastInformation.isRainy()){
+        ForecastInformationTown forecastInformationTown = SQLiteDatabaseManager.getInstance().getForecastInformation(locationId);
+        if (forecastInformationTown != null) {
+            if (forecastInformationTown.isRainy()){
                 viewHolder.rainyStateTextView.setText("비 옴");
                 viewHolder.rainyStateImageView.setImageResource(R.drawable.ic_umbrella);
             } else{

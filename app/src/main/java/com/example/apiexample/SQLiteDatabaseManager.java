@@ -50,7 +50,7 @@ public class SQLiteDatabaseManager {
         }
     }
 
-    protected void createRegionCSVTable(ArrayList<LocationInfo> regionDataCollections) {
+    protected void createLocationCSVTable(ArrayList<LocationInfo> regionDataCollections) {
 
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
 
@@ -138,6 +138,10 @@ public class SQLiteDatabaseManager {
     protected void createForecastInformationTable() {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
         mRegionDataDatabase.execSQL("CREATE TABLE IF NOT EXISTS " + Constant.FORECAST_INFORMATION_TABLE_NAME + " (" +
+                "precipitationFormDn varchar(20), " +
+                "probabilityOfPrecipitation varchar(20), " +
+                "precipitationDn varchar(20), " +
+                "updatedDate varchar(20), " +
                 "precipitationForm varchar(20), " +
                 "humidity varchar(20), " +
                 "precipitation varchar(20), " +
@@ -148,6 +152,7 @@ public class SQLiteDatabaseManager {
                 " ( locationId ) " +
                 ")"
         );
+
         addEmptyForecastInformationList();
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
@@ -159,14 +164,21 @@ public class SQLiteDatabaseManager {
             if (i == 0) {
                 locationId = Constant.CURRENT_LOCATION_ID;
             }
-
             mRegionDataDatabase.execSQL("INSERT INTO " + Constant.FORECAST_INFORMATION_TABLE_NAME + " (" +
+                    "precipitationFormDn, " +
+                    "probabilityOfPrecipitation, " +
+                    "precipitationDn, " +
+                    "updatedDate, " +
                     "precipitationForm, " +
                     "humidity, " +
                     "precipitation, " +
                     "uid, " +
                     "locationId" +
                     ") VALUES (" +
+                    "\"" + "0" + "\", " +
+                    "\"" + "" + "\", " +
+                    "\"" + "" + "\", " +
+                    "\"" + "" + "\", " +
                     "\"" + "0" + "\", " +
                     "\"" + "" + "\", " +
                     "\"" + "" + "\", " +
@@ -178,57 +190,73 @@ public class SQLiteDatabaseManager {
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
 
-    protected void addForecastInformationTable(ForecastInformation forecastInformation) {
+    protected void addForecastInformationTable(ForecastInformationTown forecastInformationTown) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
         mRegionDataDatabase.execSQL("INSERT INTO " + Constant.FORECAST_INFORMATION_TABLE_NAME + " (" +
+                "precipitationFormDn, " +
+                "probabilityOfPrecipitation, " +
+                "precipitationDn, " +
+                "updatedDate, " +
                 "precipitationForm, " +
                 "humidity, " +
                 "precipitation, " +
                 "uid, " +
                 "locationId" +
                 ") VALUES (" +
-                "\"" + forecastInformation.getPrecipitationForm() + "\", " +
-                "\"" + forecastInformation.getHumidity() + "\", " +
-                "\"" + forecastInformation.getPrecipitation() + "\", " +
-                "\"" + forecastInformation.getUid() + "\", " +
-                forecastInformation.getLocationId() +
+                "\"" + forecastInformationTown.getPrecipitationFormDN() + "\", " +
+                "\"" + forecastInformationTown.getProbabilityOfPrecipitation() + "\", " +
+                "\"" + forecastInformationTown.getPrecipitationDn() + "\", " +
+                "\"" + forecastInformationTown.getUpdatedDate() + "\", " +
+                "\"" + forecastInformationTown.getPrecipitationForm() + "\", " +
+                "\"" + forecastInformationTown.getHumidity() + "\", " +
+                "\"" + forecastInformationTown.getPrecipitation() + "\", " +
+                "\"" + forecastInformationTown.getUid() + "\", " +
+                forecastInformationTown.getLocationId() +
                 ")"
         );
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
 
-    protected void updateForecastInformationListTable(ArrayList<ForecastInformation> forecastInformationsList) {
+    protected void updateForecastInformationListTable(ArrayList<ForecastInformationTown> forecastInformationTownsList) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
-        for (ForecastInformation forecastInformation : forecastInformationsList) {
+        for (ForecastInformationTown forecastInformationTown : forecastInformationTownsList) {
             mRegionDataDatabase.execSQL("UPDATE " + Constant.FORECAST_INFORMATION_TABLE_NAME +
                     "SET " +
-                    "precipitationForm = " + "\"" + forecastInformation.getPrecipitationForm() + "\", " +
-                    "humidity = " + "\"" + forecastInformation.getHumidity() + "\", " +
-                    "precipitation = " + "\"" + forecastInformation.getPrecipitation() + "\", " +
-                    "uid = " + "\"" + forecastInformation.getUid() + "\"" +
+                    "precipitationFormDn = " + "\"" + forecastInformationTown.getPrecipitationFormDN() + "\", " +
+                    "probabilityOfPrecipitation = " + "\"" + forecastInformationTown.getProbabilityOfPrecipitation() + "\", " +
+                    "precipitationDn = " + "\"" + forecastInformationTown.getPrecipitationDn() + "\", " +
+                    "updatedDate = " + "\"" + forecastInformationTown.getUpdatedDate() + "\", " +
+                    "precipitationForm = " + "\"" + forecastInformationTown.getPrecipitationForm() + "\", " +
+                    "humidity = " + "\"" + forecastInformationTown.getHumidity() + "\", " +
+                    "precipitation = " + "\"" + forecastInformationTown.getPrecipitation() + "\", " +
+                    "uid = " + "\"" + forecastInformationTown.getUid() + "\"" +
                     " WHERE " +
-                    "locationId = " + forecastInformation.getLocationId() +
+                    "locationId = " + forecastInformationTown.getLocationId() +
                     ")"
             );
         }
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
 
-    protected void updateForecastInformationTable(ForecastInformation forecastInformation) {
+    protected void updateForecastInformationTable(ForecastInformationTown forecastInformationTown) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
         mRegionDataDatabase.execSQL("UPDATE " + Constant.FORECAST_INFORMATION_TABLE_NAME +
                 " SET " +
-                "precipitationForm = " + "\"" + forecastInformation.getPrecipitationForm() + "\", " +
-                "humidity = " + "\"" + forecastInformation.getHumidity() + "\", " +
-                "precipitation = " + "\"" + forecastInformation.getPrecipitation() + "\", " +
-                "uid = " + "\"" + forecastInformation.getUid() + "\"" +
+                "precipitationFormDn = " + "\"" + forecastInformationTown.getPrecipitationFormDN() + "\", " +
+                "probabilityOfPrecipitation = " + "\"" + forecastInformationTown.getProbabilityOfPrecipitation() + "\", " +
+                "precipitationDn = " + "\"" + forecastInformationTown.getPrecipitationDn() + "\", " +
+                "updatedDate = " + "\"" + forecastInformationTown.getUpdatedDate() + "\", " +
+                "precipitationForm = " + "\"" + forecastInformationTown.getPrecipitationForm() + "\", " +
+                "humidity = " + "\"" + forecastInformationTown.getHumidity() + "\", " +
+                "precipitation = " + "\"" + forecastInformationTown.getPrecipitation() + "\", " +
+                "uid = " + "\"" + forecastInformationTown.getUid() + "\"" +
                 " WHERE " +
-                "locationId = " + forecastInformation.getLocationId()
+                "locationId = " + forecastInformationTown.getLocationId()
         );
         SQLiteDatabaseManager.getInstance().closeDatabase();
     }
 
-    protected ArrayList<ForecastInformation> getForcastInformationList() {
+    protected ArrayList<ForecastInformationTown> getForcastInformationList() {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
         Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.FORECAST_INFORMATION_TABLE_NAME, null);
 
@@ -237,7 +265,11 @@ public class SQLiteDatabaseManager {
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 forecastInformationList.add(
-                        new ForecastInformation(
+                        new ForecastInformationTown(
+                                cursor.getString(cursor.getColumnIndex("precipitationFormDn")),
+                                cursor.getString(cursor.getColumnIndex("probabilityOfPrecipitation")),
+                                cursor.getString(cursor.getColumnIndex("precipitationDn")),
+                                cursor.getString(cursor.getColumnIndex("updatedDate")),
                                 cursor.getString(cursor.getColumnIndex("precipitationForm")),
                                 cursor.getString(cursor.getColumnIndex("humidity")),
                                 cursor.getString(cursor.getColumnIndex("precipitation")),
@@ -253,24 +285,29 @@ public class SQLiteDatabaseManager {
         return forecastInformationList;
     }
 
-    protected ForecastInformation getForecastInformation(int locationId) {
+    protected ForecastInformationTown getForecastInformation(int locationId) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
         Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.FORECAST_INFORMATION_TABLE_NAME
                 + " WHERE locationId = " + locationId, null);
 
-        ForecastInformation forecastInformation = null;
+        ForecastInformationTown forecastInformationTown = null;
         if (cursor != null && cursor.moveToFirst()) {
-            forecastInformation = new ForecastInformation(
+            forecastInformationTown = new ForecastInformationTown(
+                    cursor.getString(cursor.getColumnIndex("precipitationFormDn")),
+                    cursor.getString(cursor.getColumnIndex("probabilityOfPrecipitation")),
+                    cursor.getString(cursor.getColumnIndex("precipitationDn")),
+                    cursor.getString(cursor.getColumnIndex("updatedDate")),
                     cursor.getString(cursor.getColumnIndex("precipitationForm")),
                     cursor.getString(cursor.getColumnIndex("humidity")),
                     cursor.getString(cursor.getColumnIndex("precipitation")),
                     cursor.getString(cursor.getColumnIndex("uid")),
-                    locationId);
+                    cursor.getInt(cursor.getColumnIndex("locationId"))
+            );
         }
 
         cursor.close();
         SQLiteDatabaseManager.getInstance().closeDatabase();
-        return forecastInformation;
+        return forecastInformationTown;
     }
 
     protected void addLocationIdIntoRemainLocationIdTable(int locationId) {
@@ -344,7 +381,7 @@ public class SQLiteDatabaseManager {
         return locationIdList;
     }
 
-    public void showRegionDataListFromCSVTable() {
+    public void showLocationDataListFromCSVTable() {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
         Cursor cursor = mRegionDataDatabase.rawQuery("SELECT * FROM " + Constant.REGION_DATA_FROM_CSV_TABLE_NAME, null);
 
@@ -502,7 +539,7 @@ public class SQLiteDatabaseManager {
         return mRegionDataDatabase;
     }
 
-    public void addMyRegionDataIntoRegionIncludingCurrentLocationTable(LocationInfo locationInfo) {
+    public void addMyLocationDataIntoLocationIncludingCurrentLocationTable(LocationInfo locationInfo) {
         mRegionDataDatabase = SQLiteDatabaseManager.getInstance().openDatabase();
         mRegionDataDatabase.execSQL("INSERT INTO " + Constant.REGION_DATA_MY_REGION_INCLUDING_CURRENT_LOCATION_TABLE_NAME + " (" +
                 "regionStep1, " +

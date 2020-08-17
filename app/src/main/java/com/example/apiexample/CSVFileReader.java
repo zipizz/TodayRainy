@@ -23,7 +23,7 @@ public class CSVFileReader {
         mReader = new CSVReader(mInputStreamReader);
     }
 
-    public ArrayList<LocationInfo> getRegionDataCollectionsFromCSVFile() {
+    public ArrayList<LocationInfo> getLocationDataCollectionsFromCSVFile() {
         String[] CSVColumnData = null;
         ArrayList<LocationInfo> regionDataCollections = new ArrayList<LocationInfo>();
 

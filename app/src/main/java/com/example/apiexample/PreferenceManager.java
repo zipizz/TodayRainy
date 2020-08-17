@@ -34,28 +34,12 @@ public class PreferenceManager {
         editor.commit();
     }
 
-    public static void setLong(Context context, String key, long value) {
-        SharedPreferences.Editor editor = getPreferences(context).edit();
-        editor.putLong(key, value);
-        editor.commit();
-    }
-
-    public static void setFloat(Context context, String key, float value) {
-        SharedPreferences.Editor editor = getPreferences(context).edit();
-        editor.putFloat(key, value);
-        editor.commit();
-    }
-
     public static String getString(Context context, String key) {
         return getPreferences(context).getString(key, SHARED_PREFERENCES_STRING_DEFAULT_VALUE);
     }
 
     public static String getString(Context context, String key, String defaultValue) {
         return getPreferences(context).getString(key, defaultValue);
-    }
-
-    public static boolean getBoolean(Context context, String key) {
-        return getPreferences(context).getBoolean(key, SHARED_PREFERENCES_BOOLEAN_DEFAULT_VALUE);
     }
 
     public static boolean getBoolean(Context context, String key, boolean defaultValue) {
@@ -68,14 +52,6 @@ public class PreferenceManager {
 
     public static int getInt(Context context, String key, int defaultValue) {
         return getPreferences(context).getInt(key, defaultValue);
-    }
-
-    public static long getLong(Context context, String key) {
-        return getPreferences(context).getLong(key, SHARED_PREFERENCES_LONG_DEFAULT_VALUE);
-    }
-
-    public static float getFloat(Context context, String key) {
-        return getPreferences(context).getFloat(key, SHARED_PREFERENCES_FLOAT_DEFAULT_VALUE);
     }
 
     public static void removeKey(Context context, String key) {
@@ -96,15 +72,20 @@ public class PreferenceManager {
         editor.commit();
     }
 
-    public static void incrementMyRegionCount(Context context) {
-        setInt(context, Constant.MY_ONLY_ADDED_REGION_COUNT, getInt(context, Constant.MY_ONLY_ADDED_REGION_COUNT) + 1);
+    public static int getNextProcessStep(Context context) {
+        return PreferenceManager.getInt(context, Constant.INITIALIZE_FINISHED_LAST_STEP, 0) + 1;
     }
 
-    public static void decrementMyRegionCount(Context context) {
-        setInt(context, Constant.MY_ONLY_ADDED_REGION_COUNT, getInt(context, Constant.MY_ONLY_ADDED_REGION_COUNT) - 1);
+    public static void incrementMyLocationCount(Context context) {
+        setInt(context, Constant.MY_REGISTERED_LOCATION_COUNT_INCLUDING_CURRENT_LOCATION, getInt(context, Constant.MY_REGISTERED_LOCATION_COUNT_INCLUDING_CURRENT_LOCATION, 0) + 1);
     }
 
-    public static void incrementGrantedPermissionCount(Context context) {
-        setInt(context, Constant.GRANT_PERMISSION_COUNT, getInt(context, Constant.GRANT_PERMISSION_COUNT, 0) + 1);
+    public static void decrementMyLocationCount(Context context) {
+        setInt(context, Constant.MY_REGISTERED_LOCATION_COUNT_INCLUDING_CURRENT_LOCATION, getInt(context, Constant.MY_REGISTERED_LOCATION_COUNT_INCLUDING_CURRENT_LOCATION) - 1);
+    }
+
+    public static void incrementInitilizeStep(Context context) {
+        int initializeFinishedLastStep = getInt(context, Constant.INITIALIZE_FINISHED_LAST_STEP, 0);
+        setInt(context, Constant.INITIALIZE_FINISHED_LAST_STEP, initializeFinishedLastStep + 1);
     }
 }

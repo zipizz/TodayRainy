@@ -11,30 +11,33 @@ public class Utils {
         return String.valueOf(System.currentTimeMillis());
     }
 
-    public static ForecastInformation getForecastInformation(LinkedHashMap responseElement) {
-        int locationId = responseElement.get("locationId").toString().charAt(0) - '0';
+    public String precipitationFormDn;
+    public String probabilityOfPrecipitation;
+    public String precipitationDn;
+    public String updatedDate;
+    public String precipitationForm;
+    public String humidity;
+    public String precipitation;
+    public String uid;
+    public int locationId;
+
+    public static ForecastInformationTown getForecastInformation(LinkedHashMap responseElement) {
+        String precipitationFormDn = responseElement.get("precipitationFormDn").toString();
+        String probabilityOfPrecipitation = responseElement.get("probabilityOfPrecipitation").toString();
+        String precipitationDn = responseElement.get("precipitationDn").toString();
+        String updatedDate = responseElement.get("updatedDate").toString();
         String precipitationForm = responseElement.get("precipitationForm").toString();
         String humidity = responseElement.get("humidity").toString();
         String precipitation = responseElement.get("precipitation").toString();
         String uid = responseElement.get("uid").toString();
-        return new ForecastInformation(precipitationForm, humidity, precipitation, uid, locationId);
+        int locationId = responseElement.get("locationId").toString().charAt(0) - '0';
+        return new ForecastInformationTown(precipitationFormDn, probabilityOfPrecipitation, precipitationDn, updatedDate, precipitationForm,
+                humidity, precipitation, uid, locationId);
     }
 
     public static String getFormattedLocationNameFromFullName(String fullName) {
-
         int lastSpaceIndex = fullName.lastIndexOf(' ');
         return fullName.substring(0, lastSpaceIndex).replaceAll("대한민국 ", "");
-//        for (int i = 0, spaceCount = 0; i < fullName.length(); i++) {
-//
-//            if (fullName.charAt(i) == ' ') {
-//                spaceCount++;
-//            }
-//            if (spaceCount == 4) {
-//                fullName = fullName.substring(0, i).replaceAll("대한민국 ", "");
-//                break;
-//            }
-//        }
-//        return fullName;
     }
 
     public static float convertDpToPixel(float dp, Context context){
