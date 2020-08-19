@@ -62,6 +62,10 @@ public class Constant {
     public static final String INITIALIZE_STEP_CURRENT_LOCATION_REGISTER = "INITIALIZE_STEP_CURRENT_LOCATION_REGISTER";
     public static final String INITIALIZE_STEP_GET_FORECAST_INFORMATION = "INITIALIZE_STEP_GET_FORECAST_INFORMATION";
 
+    public static final int GET_FORECAST_INFORMATION_DURATION_HOUR_FOR_DONGNE = 3;
+    public static final int GET_FORECAST_INFORMATION_DELAY_MINUTE_AFTER_TIME_POINT_FOR_DONGNE = 25;
+    public static final int GET_FORECAST_INFORMATION_BASE_TIME_HOUR_FOR_DONGNE = 2;
+
     public static final List<String> INITIALIZE_STEP_WORKS = Collections.unmodifiableList(
                     new ArrayList<String>() {
                         {

@@ -46,13 +46,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startGetForecastInformationService() {
+        System.out.println("my app test start getForcastInformation Service");
         Constraints constraints = new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
+        System.out.println("my app test start getForcastInformation Service constraint build finish");
         PeriodicWorkRequest workRequest =
                 new PeriodicWorkRequest.Builder(GetForecastInformationWorker.class, Constant.GET_FORECAST_INFORMATION_PERIOD_MINUTE, TimeUnit.MINUTES)
+                        .setInitialDelay(Utils.getDelayTimeForGetForecastInformationServiceDongneStart(), TimeUnit.MILLISECONDS)
                         .setConstraints(constraints)
                         .build();
-        WorkManager workManager = WorkManager.getInstance();
-        workManager.enqueueUniquePeriodicWork(Constant.GET_FORECAST_INFORMATION_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest);
+        System.out.println("my app test start getForcastInformation Service workrequest build finish");
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(Constant.GET_FORECAST_INFORMATION_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest);
+        System.out.println("my app test start getForcastInformation Service enqueue finish.");
     }
 
 //    protected void deleteUser() {

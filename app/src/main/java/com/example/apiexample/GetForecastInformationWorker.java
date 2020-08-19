@@ -13,14 +13,12 @@ public class GetForecastInformationWorker extends Worker {
 
     public GetForecastInformationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
-        count = 0;
     }
 
     @NonNull
     @Override
     public Result doWork() {
-        System.out.println("my app test : service do work at " + count++);
-        RestAPIFunction.getInstance(getApplicationContext()).getAllLocalWeather(PreferenceManager.getString(getApplicationContext(), Constant.USER_ID));
-        return Result.success();
+        System.out.println("my app test start worker do work start, and this is count at : " + count++);
+        return RestAPIFunction.getInstance(getApplicationContext()).getAllLocalWeatherBackground(PreferenceManager.getString(getApplicationContext(), Constant.USER_ID));
     }
 }

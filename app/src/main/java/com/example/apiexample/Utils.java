@@ -3,7 +3,12 @@ package com.example.apiexample;
 import android.content.Context;
 import android.util.DisplayMetrics;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
 
@@ -46,5 +51,41 @@ public class Utils {
 
     public static float convertPixelsToDp(float px, Context context){
         return px / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    // 2 5 8 11 14 17 20 23
+    public static long getDelayTimeForGetForecastInformationServiceDongneStart() {
+
+//        // date format
+//        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+//        // two dates
+//        java.util.Date scheduledDate;
+//        Calendar current = Calendar.getInstance();
+//        java.util.Date currentDate;
+//        String current_date = format.format(current.getTime());
+//        try {
+//            scheduledDate = format.parse(scheduled_date);
+//            currentDate = format.parse(current_date);
+//            long diffInMillies = scheduledDate.getTime() - currentDate.getTime();
+//            long diffence_in_minute = TimeUnit.MINUTES.convert(diffInMillies,TimeUnit.MILLISECONDS);
+//            System.out.println(diffence_in_minute);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//        Date date = new Date();   // given date
+//        Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
+//        calendar.setTime(date);   // assigns calendar to given date
+//        calendar.get(Calendar.HOUR_OF_DAY); // gets hour in 24h format
+//        calendar.get(Calendar.MINUTE);
+//        calendar.get(Calendar.)
+//
+//        SimpleDateFormat sdf = new SimpleDateFormat("HH");
+//        int currentHour = Integer.parseInt(sdf.format(new Date(System.currentTimeMillis())));
+//
+//
+      return  System.currentTimeMillis();
+        
     }
 }
