@@ -110,7 +110,7 @@ public class TextViewPagerAdapter extends PagerAdapter {
 
             if (hasLocationAtLeastOne) {
                 ((TextView) mView.findViewById(R.id.currentLocation)).setText(locationInfo.toString());
-                ((TextView) mView.findViewById(R.id.updateTime)).setText(forecastInformationTown.getFormattedUpdatedDate());
+                ((TextView) mView.findViewById(R.id.updateTime)).setText(forecastInformationTown.getUpdatedDate());
             } else {
                 ((TextView) mView.findViewById(R.id.currentLocation)).setVisibility(View.INVISIBLE);
                 ((TextView) mView.findViewById(R.id.updateTime)).setVisibility(View.INVISIBLE);
@@ -159,6 +159,7 @@ public class TextViewPagerAdapter extends PagerAdapter {
                     }
                 });
             } else {
+                ((AppCompatImageView) mView.findViewById(R.id.imageCenter)).setImageResource(R.drawable.ic_add_circle_outline);
                 ((AppCompatImageView) mView.findViewById(R.id.imageCenter)).setOnClickListener(new OnCustomClickListener() {
                     @Override
                     public void onSingleClick(View v) {
@@ -168,17 +169,6 @@ public class TextViewPagerAdapter extends PagerAdapter {
                 });
             }
         }
-
-//        for (int i = 1; i <= 5; i++) {
-//            ((Button)mView.findViewById(parentActivity.getResources().getIdentifier("deleteBtn" + i, "id", "com.example.apiexample")))
-//                    .setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            int locationId = ((Button)v).getText().charAt(1) - '0';
-//                            parentActivity.deleteRequestDeleteLocation(locationId);
-//                        }
-//                    });
-//        }
 
         container.addView(mView);
 
@@ -194,65 +184,4 @@ public class TextViewPagerAdapter extends PagerAdapter {
     public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
         return (view == (View)object);
     }
-
-    private View.OnClickListener todayRainyBtnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-
-            getRequestGetLocalWeather();
-
-//            if (mGPSInformation == null) {
-//                mGPSInformation = new GPSInformation(MainActivity.this);
-//            }
-//            postCreateRequest(mGPSInformation.getLatitudeHour(), mGPSInformation.getLatitudeMinute(), mGPSInformation.getLongitudeHour(), mGPSInformation.getLongitudeMinute());
-        }
-    };
-
-    private void getRequestGetLocalWeather() {
-        RestAPI restAPI = mRetrofit.create(RestAPI.class);
-        String myUserId = PreferenceManager.getString(mContext, Constant.USER_ID);
-        System.out.println("My app test : getLocalWeather user Id : " + myUserId);
-        restAPI.getLocalWeather(myUserId).enqueue(getLocalWeathersCallback);
-    }
-
-    private Callback<List<LinkedHashMap>> getLocalWeathersCallback = new Callback<List<LinkedHashMap>>() {
-        @Override
-        public void onResponse(Call<List<LinkedHashMap>> call, Response<List<LinkedHashMap>> response) {
-            if(response.isSuccessful()) {
-
-                List<LinkedHashMap> responseBody = response.body();
-                System.out.println("My app test getlocalweathers: onResponse succeful, size : " + responseBody.size());
-                int index = 0;
-                String resultText = "";
-                for (LinkedHashMap responseElement : responseBody) {
-                    int locationId = responseElement.get("locationId").toString().charAt(0) - '0';
-                    LocationInfo locationInfo = SQLiteDatabaseManager.getInstance().getMyRegionDataFromRegionIncludingCurrentLocationTable(locationId);
-                    String currentText = "[" + locationInfo.getLocationId() + "] "
-                            + locationInfo.toString() + ", uid : " + responseElement.get("uid")
-                            + ", rn1 : " + responseElement.get("precipitation")
-                            + ", reh : " + responseElement.get("humidity")
-                            + ", pty : " + responseElement.get("precipitationForm")
-                            + (responseElement.get("precipitationForm").toString().charAt(0) != '0' ? " 비 온다." : " 비 안온다.");
-
-                    resultText += currentText + "\n";
-                    System.out.println(currentText);
-                }
-                System.out.println("My app test : herehere and this is body : " + responseBody.toString());
-//                parentActivity.setMainText(resultText);
-            } else {
-                System.out.println("My app test : herehere response fail at gggg");
-            }
-        }
-
-        @Override
-        public void onFailure(Call<List<LinkedHashMap>> call, Throwable t) {
-            System.out.println("My app test : herehere response fail at gggg");
-        }
-    };
-
-//    public void setSelectedRegionInformation(String regionOneStep, String regionTwoStep, String regionThreeStep) {
-//        mSelectedRegionData = new RegionData(regionOneStep, regionTwoStep, regionThreeStep);
-//    }
-
-
 }

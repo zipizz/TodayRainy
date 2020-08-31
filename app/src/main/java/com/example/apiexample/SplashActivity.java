@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -18,16 +20,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
-
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,18 +35,50 @@ public class SplashActivity extends AppCompatActivity {
     private ArrayList<LocationInfo> mRegionDataCollections = null;
     private LocationInfoForServer mCurrentLocationInfo = null;
     private static Context mContext;
-
-
     private ArrayList<String> mManifestPermissionName = null;
     private ArrayList<String> mPermissionDeniedMessage = null;
+
+    private enum CheckConditionState {
+        OK, NOT_OK
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        checkCondition();
         initiateVariable();
         processInitilize();
     }
+
+    private void checkCondition() {
+        if(checkNetworkState().equals(CheckConditionState.NOT_OK)) {
+            return;
+        }
+//        if (checkOtherState().equals(CheckConditionState.NOT_OK)) {
+//            return;
+//        }
+    }
+
+    private CheckConditionState checkNetworkState() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+            return CheckConditionState.OK;
+        }
+
+        appExit(new int[]{R.string.network_not_connected, R.string.network_confirm, R.string.app_exit}, true);
+        return CheckConditionState.NOT_OK;
+    }
+
+//    private CheckConditionState checkOtherState() {
+//        if (okokCondition) {
+//            return CheckConditionState.OK;
+//        }
+//
+//        appExit(new int[]{R.string.other_problem_occurs, R.string.app_exit}, true);
+//        return CheckConditionState.NOT_OK;
+//    }
 
     private void initiateVariable() {
         new RestAPIInstance(this);
@@ -187,8 +212,18 @@ public class SplashActivity extends AppCompatActivity {
 
         if (isPermissionDenied(requestCode, permissions, grantResults)) {
             Log.d("First App Installed", "My app test Permission Denied");
-            // TODO 뷰처리
-            appExit(R.string.permission_denied_exit);
+            new AlertDialog.Builder(this)
+                    .setTitle("알림")
+                    .setMessage(getString(R.string.permission_denied_exit))
+                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            appExit(R.string.permission_denied_exit);
+                        }
+                    })
+                    .setCancelable(false)
+                    .create()
+                    .show();
             return;
         }
 
@@ -224,8 +259,33 @@ public class SplashActivity extends AppCompatActivity {
 
     // TODO 뷰 처리
     private void appExit(int exitStringId) {
-        Toast.makeText(this, exitStringId, Toast.LENGTH_LONG).show();
-        finish();
+        appExit(getString(exitStringId));
+    }
+
+    private void appExit(int[] exitStringIdList, boolean splitWithSpace) {
+        StringBuffer sb = new StringBuffer();
+        for (int stringId : exitStringIdList) {
+            sb.append(getString(stringId));
+            if (splitWithSpace) {
+                sb.append(" ");
+            }
+        }
+        appExit(sb.toString());
+    }
+
+    private void appExit(String exitString) {
+        new AlertDialog.Builder(this)
+                .setTitle("알림")
+                .setMessage(exitString)
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                })
+                .setCancelable(false)
+                .create()
+                .show();
     }
 
     private void convertFromCSVToDatabase() {

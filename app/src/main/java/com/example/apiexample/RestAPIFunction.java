@@ -1,5 +1,6 @@
 package com.example.apiexample;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -67,6 +68,15 @@ public class RestAPIFunction {
 //        restAPI.getLocalWeather(userId).enqueue(getAllLocalWeatherOnServiceCallbackFunction);
 //    }
 
+    private SelectLocationActivity thisActivity;
+    public void getAllLocalWeather(String userId, SelectLocationActivity activity) {
+        this.thisActivity = activity;
+        this.isCalledFromSplashActivity = false;
+        RestAPI restAPI = RestAPIInstance.getInstance().create(RestAPI.class);
+        restAPI.getLocalWeather(userId).enqueue(getAllLocalWeatherCallbackFunction);
+    }
+
+
     public void getAllLocalWeather(String userId, boolean isCalledFromSplashActivity) {
         Log.d("First App Installed", "My app test user id : " + userId);
         Log.d("First App Installed", "My app test from splash Activity ? : " + isCalledFromSplashActivity);
@@ -81,10 +91,12 @@ public class RestAPIFunction {
             if (response.isSuccessful()) {
                 boolean isRainy = false;
                 ArrayList<String>rainyLocation = new ArrayList<>();
+                String updatedDateForService = Utils.getFormattedCurrentTimeString();
+
                 Log.d("First App Installed", "My app test Start get all local weather success toString : " + response.toString());
                 for (LinkedHashMap responseElement : response.body()) {
                     Log.d("First App Installed", "My app test Start get all local weather success body toString : " + responseElement.toString());
-                    ForecastInformationTown forecastInformationTown = Utils.getForecastInformation(responseElement);
+                    ForecastInformationTown forecastInformationTown = Utils.getForecastInformation(responseElement, updatedDateForService);
                     SQLiteDatabaseManager.getInstance().updateForecastInformationTable(forecastInformationTown);
                     if(forecastInformationTown.isRainy()) {
                         isRainy = true;
@@ -95,6 +107,9 @@ public class RestAPIFunction {
                 if (isCalledFromSplashActivity) {
                     Log.d("First App Installed", "My app test : startMainActivity at RestAPIFunction");
                     parentActivity.startMainActivity();
+                }
+                if (thisActivity != null) {
+                    thisActivity.processCallback();
                 }
             } else {
                 Log.d("First App Installed", "My app test Start get all local weather not successful");
@@ -129,12 +144,13 @@ public class RestAPIFunction {
         ArrayList<String>rainyLocation = new ArrayList<>();
         SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date(System.currentTimeMillis());
-        String updatedTime = formatter.format(date);
+        String updatedDate = formatter.format(date);
+        String updatedDateForService = Utils.getFormattedCurrentTimeString();
 
         Log.d("First App Installed", "My app test Start get all local weather success toString : " + response.toString());
         for (LinkedHashMap responseElement : response.body()) {
             Log.d("First App Installed", "My app test Start get all local weather success body toString : " + responseElement.toString());
-            ForecastInformationTown forecastInformationTown = Utils.getForecastInformation(responseElement);
+            ForecastInformationTown forecastInformationTown = Utils.getForecastInformation(responseElement, updatedDateForService);
             SQLiteDatabaseManager.getInstance().updateForecastInformationTable(forecastInformationTown);
             if(forecastInformationTown.isRainy()) {
                 isRainy = true;
@@ -166,7 +182,7 @@ public class RestAPIFunction {
 
         if (!isRainy) {
             builder.setSmallIcon(R.drawable.ic_sun)
-                    .setContentTitle("오늘 비 안 온다. " + updatedTime);
+                    .setContentTitle("오늘 비 안 온다. " + updatedDate);
         } else {
             String rainyLocationList = "";
             for (String rainyLocationElement : rainyLocation) {
@@ -174,7 +190,7 @@ public class RestAPIFunction {
             }
             rainyLocationList = rainyLocationList.substring(0, rainyLocationList.length() - 1);
             builder.setSmallIcon(R.drawable.ic_umbrella)
-                    .setContentTitle("오늘 비 온다. " + updatedTime)
+                    .setContentTitle("오늘 비 온다. " + updatedDate)
                     .setContentText("장소는 " + rainyLocationList);
         }
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(parentActivity);

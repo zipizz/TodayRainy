@@ -40,6 +40,11 @@ public class Utils {
                 humidity, precipitation, uid, locationId);
     }
 
+    public static ForecastInformationTown getForecastInformation(LinkedHashMap responseElement, String updatedDate) {
+        responseElement.put("updatedDate", updatedDate);
+        return getForecastInformation(responseElement);
+    }
+
     public static String getFormattedLocationNameFromFullName(String fullName) {
         int lastSpaceIndex = fullName.lastIndexOf(' ');
         return fullName.substring(0, lastSpaceIndex).replaceAll("대한민국 ", "");
@@ -54,38 +59,41 @@ public class Utils {
     }
 
     // 2 5 8 11 14 17 20 23
-    public static long getDelayTimeForGetForecastInformationServiceDongneStart() {
+    public static long getDelayTimeForGetForecastInformationServiceDongNeStart() {
+        long currentTimeMillis = System.currentTimeMillis();
+        Date currentDate = new Date(currentTimeMillis);
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(currentDate);
+        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = calendar.get(Calendar.MINUTE);
+        int remainHour = getRemainHour(currentHour);
 
-//        // date format
-//        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
-//        // two dates
-//        java.util.Date scheduledDate;
-//        Calendar current = Calendar.getInstance();
-//        java.util.Date currentDate;
-//        String current_date = format.format(current.getTime());
-//        try {
-//            scheduledDate = format.parse(scheduled_date);
-//            currentDate = format.parse(current_date);
-//            long diffInMillies = scheduledDate.getTime() - currentDate.getTime();
-//            long diffence_in_minute = TimeUnit.MINUTES.convert(diffInMillies,TimeUnit.MILLISECONDS);
-//            System.out.println(diffence_in_minute);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//
-//        Date date = new Date();   // given date
-//        Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
-//        calendar.setTime(date);   // assigns calendar to given date
-//        calendar.get(Calendar.HOUR_OF_DAY); // gets hour in 24h format
-//        calendar.get(Calendar.MINUTE);
-//        calendar.get(Calendar.)
-//
-//        SimpleDateFormat sdf = new SimpleDateFormat("HH");
-//        int currentHour = Integer.parseInt(sdf.format(new Date(System.currentTimeMillis())));
-//
-//
-      return  System.currentTimeMillis();
-        
+        if (!isNoNeedToAddDelayHour(currentHour, currentMinute)) {
+            calendar.add(Calendar.HOUR_OF_DAY, remainHour);
+        }
+        calendar.set(Calendar.MINUTE, Constant.GET_FORECAST_INFORMATION_DELAY_MINUTE_AFTER_TIME_POINT_FOR_DONGNE);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis() - currentTimeMillis;
+    }
+
+    public static String getFormattedCurrentTimeString() {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) - calendar.get(Calendar.MINUTE) % 5);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        return sdf.format(calendar.getTime());
+    }
+
+    static int getRemainHour(int currentHour) {
+        int calculateHour = currentHour - Constant.GET_FORECAST_INFORMATION_BASE_TIME_HOUR_FOR_DONGNE + Constant.GET_FORECAST_INFORMATION_DURATION_HOUR_FOR_DONGNE;
+        calculateHour = calculateHour % Constant.GET_FORECAST_INFORMATION_DURATION_HOUR_FOR_DONGNE;
+        return Constant.GET_FORECAST_INFORMATION_DURATION_HOUR_FOR_DONGNE - calculateHour;
+    }
+
+    // 23.00 ~ 23.25 2.00 ~ 2.25
+    private static boolean isNoNeedToAddDelayHour(int currentHour, int currentMinute) {
+        return currentHour % Constant.GET_FORECAST_INFORMATION_DURATION_HOUR_FOR_DONGNE == Constant.GET_FORECAST_INFORMATION_BASE_TIME_HOUR_FOR_DONGNE
+                && currentMinute <= Constant.GET_FORECAST_INFORMATION_DELAY_MINUTE_AFTER_TIME_POINT_FOR_DONGNE;
     }
 }

@@ -92,10 +92,7 @@ public class SelectLocationActivity extends AppCompatActivity {
                     mSQLiteDatabaseManager.addMyLocationDataIntoLocationIncludingCurrentLocationTable(mSelectedLocationInfo);
                     mSQLiteDatabaseManager.deleteLocationIdFromRemainLocationIdTable(mSelectedLocationId);
                     PreferenceManager.incrementMyLocationCount(SelectLocationActivity.this);
-                    Intent intent = new Intent();
-                    intent.putExtra("hasAddedRegion", true);
-                    setResult(Constant.ADD_LOCATION_RESULT_SUCCESS_CODE, intent);
-                    finish();
+                    RestAPIFunction.getInstance(SelectLocationActivity.this).getAllLocalWeather(PreferenceManager.getString(SelectLocationActivity.this, Constant.USER_ID), SelectLocationActivity.this);
                 } else {
                     System.out.println("My app test add location : response code fail");
                 }
@@ -112,6 +109,13 @@ public class SelectLocationActivity extends AppCompatActivity {
             System.out.println("My app test add location : location add Fail 3");
         }
     };
+
+    void processCallback() {
+        Intent intent = new Intent();
+        intent.putExtra("hasAddedRegion", true);
+        setResult(Constant.ADD_LOCATION_RESULT_SUCCESS_CODE, intent);
+        finish();
+    }
 
     private int currentFragmentRegionStep = 1;
 

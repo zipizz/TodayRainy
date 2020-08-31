@@ -250,6 +250,7 @@ public class AddLocationActivity extends AppCompatActivity {
                 for (int i = 0; i < mCustomArrayList.size(); i++) {
                     System.out.println("my app test [" + i + "] : " + mCustomArrayList.get(i).toString());
                 }
+
                 mAddLocationListViewAdapter = new AddLocationListViewAdapter(this, mCustomArrayList, this);
                 mEditLocationOrderListViewAdapter = new EditLocationOrderListViewAdapter(this, mCustomArrayList, this);
                 mListView.setAdapter(mAddLocationListViewAdapter);

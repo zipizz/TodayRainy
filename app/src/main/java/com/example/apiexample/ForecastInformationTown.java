@@ -46,10 +46,10 @@ public class ForecastInformationTown {
         return precipitationFormDn.charAt(0) - '0' > 0;
     }
 
-    public String getFormattedUpdatedDate() {
-        if (updatedDate.length() > 5) {
-            return updatedDate.substring(0, updatedDate.length() - 5);
-        }
-        return updatedDate;
-    }
+//    public String getFormattedUpdatedDate() {
+//        if (updatedDate.length() > 5) {
+//            return updatedDate.substring(0, updatedDate.length() - 5);
+//        }
+//        return updatedDate;
+//    }
 }
